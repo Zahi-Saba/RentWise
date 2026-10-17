@@ -6,6 +6,10 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		60E6D88930872704006E2A32 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 60E6D88830872704006E2A32 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		60E6D88F30872704006E2A32 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -25,6 +29,7 @@
 
 /* Begin PBXFileReference section */
 		60E6D88130872703006E2A32 /* RentWise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RentWise.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		60E6D88830872704006E2A32 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		60E6D88E30872704006E2A32 /* RentWiseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RentWiseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		60E6D89830872704006E2A32 /* RentWiseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RentWiseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -38,11 +43,6 @@
 		60E6D89130872704006E2A32 /* RentWiseTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = RentWiseTests;
-			sourceTree = "<group>";
-		};
-		60E6D89B30872704006E2A32 /* RentWiseUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = RentWiseUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -69,9 +69,9 @@
 		60E6D87830872703006E2A32 = {
 			isa = PBXGroup;
 			children = (
+				60E6D88830872704006E2A32 /* Assets.xcassets */,
 				60E6D88330872703006E2A32 /* RentWise */,
 				60E6D89130872704006E2A32 /* RentWiseTests */,
-				60E6D89B30872704006E2A32 /* RentWiseUITests */,
 				60E6D88230872703006E2A32 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -141,9 +141,6 @@
 			dependencies = (
 				60E6D89A30872704006E2A32 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				60E6D89B30872704006E2A32 /* RentWiseUITests */,
-			);
 			name = RentWiseUITests;
 			productName = RentWiseUITests;
 			productReference = 60E6D89830872704006E2A32 /* RentWiseUITests.xctest */;
@@ -197,6 +194,7 @@
 		60E6D87F30872703006E2A32 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				60E6D88930872704006E2A32 /* Assets.xcassets in Resources */,
 			);
 		};
 		60E6D88C30872704006E2A32 /* Resources */ = {
