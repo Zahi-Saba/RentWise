@@ -8,8 +8,14 @@
 import Foundation
 import Combine
 import WidgetKit
+import LinkPresentation
 
 class RentWiseViewModel: ObservableObject {
+    @Published var isImportingListings = false
+    @Published var importMessage = ""
+    let listingPreviewService = ListingPreviewService()
+    private var attemptedListingImports: Set<String> = []
+
 
     @Published var rentalProperties: [RentalProperty] = []
     @Published var inspections: [RentalInspection] = []
@@ -422,5 +428,54 @@ class RentWiseViewModel: ObservableObject {
         WidgetCenter.shared.reloadTimelines(
             ofKind: SharedWidgetData.widgetKind
         )
+    }
+
+    func importSharedListings() async {
+        guard !isImportingListings else { return }
+        let links = SharedRentalLinkData.loadLinks().filter { !attemptedListingImports.contains($0) }
+        guard !links.isEmpty else { return }
+        isImportingListings = true
+        importMessage = ""
+        defer { isImportingListings = false }
+        let useCase = ImportSharedPropertyUseCase(repository: repository)
+        for link in links {
+            attemptedListingImports.insert(link)
+            do {
+                let url = try ImportSharedPropertyUseCase.validatedURL(link)
+                let metadata = await listingPreviewService.metadata(for: url)
+                _ = try useCase.execute(link: link, title: metadata?.title)
+                // A queued link is acknowledged only after persistence succeeds.
+                SharedRentalLinkData.removeLink(link)
+                loadRentalProperties()
+            } catch {
+                importMessage = "A shared listing could not be saved. Pull down to retry."
+            }
+        }
+    }
+
+    func refreshShortlist() async {
+        loadRentalProperties()
+        loadUpcomingInspections()
+        await importSharedListings()
+    }
+
+    func retrySharedImports() async {
+        guard !isImportingListings else { return }
+        attemptedListingImports.removeAll()
+        await refreshShortlist()
+    }
+
+    func importListingURL(_ text: String) async -> Bool {
+        importMessage = ""
+        do {
+            let url = try ImportSharedPropertyUseCase.validatedURL(text)
+            let metadata = await listingPreviewService.metadata(for: url)
+            _ = try ImportSharedPropertyUseCase(repository: repository).execute(link: text, title: metadata?.title)
+            loadRentalProperties()
+            return true
+        } catch {
+            importMessage = error.localizedDescription
+            return false
+        }
     }
 }

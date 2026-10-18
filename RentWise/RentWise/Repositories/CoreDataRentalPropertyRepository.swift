@@ -29,6 +29,7 @@ class CoreDataRentalPropertyRepository: RentalPropertyRepository {
         propertyEntity.id = property.id
         propertyEntity.address = property.address
         propertyEntity.weeklyRent = property.weeklyRent
+        propertyEntity.sourceURL = property.sourceURL
 
         try context.save()
     }
@@ -156,7 +157,8 @@ class CoreDataRentalPropertyRepository: RentalPropertyRepository {
                 let property = RentalProperty(
                     id: id,
                     address: address,
-                    weeklyRent: entity.weeklyRent
+                    weeklyRent: entity.weeklyRent,
+                    sourceURL: entity.sourceURL
                 )
 
                 properties.append(property)

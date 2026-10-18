@@ -11,14 +11,23 @@ struct RentalProperty: Identifiable {
     let id: UUID
     var address: String
     var weeklyRent: Double
+    var sourceURL: String?
 
     init(
         id: UUID = UUID(),
         address: String,
-        weeklyRent: Double
+        weeklyRent: Double,
+        sourceURL: String? = nil
     ) {
         self.id = id
         self.address = address
         self.weeklyRent = weeklyRent
+        self.sourceURL = sourceURL
+    }
+
+    var rentLabel: String {
+        weeklyRent > 0
+            ? String(format: "$%.0f / week", weeklyRent)
+            : "Rent not supplied"
     }
 }
