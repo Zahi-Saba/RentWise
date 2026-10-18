@@ -7,10 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		603BFE65308DEEAC0085FB11 /* RentWiseShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 603BFE5B308DEEAC0085FB11 /* RentWiseShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		60E6D88930872704006E2A32 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 60E6D88830872704006E2A32 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		603BFE63308DEEAC0085FB11 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 60E6D87930872703006E2A32 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 603BFE5A308DEEAC0085FB11;
+			remoteInfo = RentWiseShare;
+		};
 		60E6D88F30872704006E2A32 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 60E6D87930872703006E2A32 /* Project object */;
@@ -27,16 +35,57 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		603BFE66308DEEAC0085FB11 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = PlugIns;
+			files = (
+				603BFE65308DEEAC0085FB11 /* RentWiseShare.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		603BFE5B308DEEAC0085FB11 /* RentWiseShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = RentWiseShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		60E6D88130872703006E2A32 /* RentWise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RentWise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		60E6D88830872704006E2A32 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		60E6D88E30872704006E2A32 /* RentWiseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RentWiseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		60E6D89830872704006E2A32 /* RentWiseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RentWiseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		603BFE69308DEEAC0085FB11 /* Exceptions for "RentWiseShare" folder in "RentWiseShare" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 603BFE5A308DEEAC0085FB11 /* RentWiseShare */;
+		};
+		603BFE6E308DEFA70085FB11 /* Exceptions for "RentWise" folder in "RentWiseShare" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Shared/SharedRentalLinkData.swift,
+			);
+			target = 603BFE5A308DEEAC0085FB11 /* RentWiseShare */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		603BFE5C308DEEAC0085FB11 /* RentWiseShare */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				603BFE69308DEEAC0085FB11 /* Exceptions for "RentWiseShare" folder in "RentWiseShare" target */,
+			);
+			path = RentWiseShare;
+			sourceTree = "<group>";
+		};
 		60E6D88330872703006E2A32 /* RentWise */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				603BFE6E308DEFA70085FB11 /* Exceptions for "RentWise" folder in "RentWiseShare" target */,
+			);
 			path = RentWise;
 			sourceTree = "<group>";
 		};
@@ -48,6 +97,11 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		603BFE58308DEEAC0085FB11 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
 		60E6D87E30872703006E2A32 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
@@ -72,6 +126,7 @@
 				60E6D88830872704006E2A32 /* Assets.xcassets */,
 				60E6D88330872703006E2A32 /* RentWise */,
 				60E6D89130872704006E2A32 /* RentWiseTests */,
+				603BFE5C308DEEAC0085FB11 /* RentWiseShare */,
 				60E6D88230872703006E2A32 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -82,6 +137,7 @@
 				60E6D88130872703006E2A32 /* RentWise.app */,
 				60E6D88E30872704006E2A32 /* RentWiseTests.xctest */,
 				60E6D89830872704006E2A32 /* RentWiseUITests.xctest */,
+				603BFE5B308DEEAC0085FB11 /* RentWiseShare.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -89,6 +145,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		603BFE5A308DEEAC0085FB11 /* RentWiseShare */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 603BFE6A308DEEAC0085FB11 /* Build configuration list for PBXNativeTarget "RentWiseShare" */;
+			buildPhases = (
+				603BFE57308DEEAC0085FB11 /* Sources */,
+				603BFE58308DEEAC0085FB11 /* Frameworks */,
+				603BFE59308DEEAC0085FB11 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				603BFE5C308DEEAC0085FB11 /* RentWiseShare */,
+			);
+			name = RentWiseShare;
+			productName = RentWiseShare;
+			productReference = 603BFE5B308DEEAC0085FB11 /* RentWiseShare.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		60E6D88030872703006E2A32 /* RentWise */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 60E6D8A030872704006E2A32 /* Build configuration list for PBXNativeTarget "RentWise" */;
@@ -96,8 +170,12 @@
 				60E6D87D30872703006E2A32 /* Sources */,
 				60E6D87E30872703006E2A32 /* Frameworks */,
 				60E6D87F30872703006E2A32 /* Resources */,
+				603BFE66308DEEAC0085FB11 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
+			);
+			dependencies = (
+				603BFE64308DEEAC0085FB11 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				60E6D88330872703006E2A32 /* RentWise */,
@@ -156,6 +234,9 @@
 				LastSwiftUpdateCheck = 2700;
 				LastUpgradeCheck = 2700;
 				TargetAttributes = {
+					603BFE5A308DEEAC0085FB11 = {
+						CreatedOnToolsVersion = 27.0;
+					};
 					60E6D88030872703006E2A32 = {
 						CreatedOnToolsVersion = 27.0;
 					};
@@ -186,11 +267,17 @@
 				60E6D88030872703006E2A32 /* RentWise */,
 				60E6D88D30872704006E2A32 /* RentWiseTests */,
 				60E6D89730872704006E2A32 /* RentWiseUITests */,
+				603BFE5A308DEEAC0085FB11 /* RentWiseShare */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		603BFE59308DEEAC0085FB11 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
 		60E6D87F30872703006E2A32 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
@@ -210,6 +297,11 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		603BFE57308DEEAC0085FB11 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 		60E6D87D30872703006E2A32 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -228,6 +320,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		603BFE64308DEEAC0085FB11 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 603BFE5A308DEEAC0085FB11 /* RentWiseShare */;
+			targetProxy = 603BFE63308DEEAC0085FB11 /* PBXContainerItemProxy */;
+		};
 		60E6D89030872704006E2A32 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 60E6D88030872703006E2A32 /* RentWise */;
@@ -241,6 +338,64 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		603BFE67308DEEAC0085FB11 /* Debug configuration for PBXNativeTarget "RentWiseShare" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = RentWiseShare/RentWiseShare.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RentWiseShare/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = RentWiseShare;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ZahiOrg.RentWise.RentWiseShare;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		603BFE68308DEEAC0085FB11 /* Release configuration for PBXNativeTarget "RentWiseShare" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = RentWiseShare/RentWiseShare.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RentWiseShare/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = RentWiseShare;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ZahiOrg.RentWise.RentWiseShare;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		60E6D89E30872704006E2A32 /* Debug configuration for PBXProject "RentWise" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -365,6 +520,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = RentWise/RentWise.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -381,6 +537,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ZahiOrg.RentWise;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -396,6 +553,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = RentWise/RentWise.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -412,6 +570,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ZahiOrg.RentWise;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -505,6 +664,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		603BFE6A308DEEAC0085FB11 /* Build configuration list for PBXNativeTarget "RentWiseShare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				603BFE67308DEEAC0085FB11 /* Debug configuration for PBXNativeTarget "RentWiseShare" */,
+				603BFE68308DEEAC0085FB11 /* Release configuration for PBXNativeTarget "RentWiseShare" */,
+			);
+			defaultConfigurationName = Release;
+		};
 		60E6D87C30872703006E2A32 /* Build configuration list for PBXProject "RentWise" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
