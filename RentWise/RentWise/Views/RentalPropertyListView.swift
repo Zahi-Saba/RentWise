@@ -1,182 +1,86 @@
-//
-//  RentalPropertyListView.swift
-//  RentWise
-//
-//  Created by Zahi Saba on 30/9/2026.
-//
-
 import SwiftUI
 
 struct RentalPropertyListView: View {
-
     @ObservedObject var viewModel: RentWiseViewModel
-
+    @State private var showImport = false
     var body: some View {
-
-        NavigationView {
-
-            ZStack {
-
-                                RentWiseTheme.background
-                    .ignoresSafeArea()
-
-                VStack(spacing: 20) {
-
-                    VStack(
-                        alignment: .leading,
-                        spacing: 5
-                    ) {
-
-                        Text("RentWise")
-                            .font(.largeTitle)
-                            .bold()
-                            .foregroundColor(
-                                                RentWiseTheme.mainText
-                            )
-
-                        Text("Find. Inspect. Decide.")
-                            .foregroundColor(
-                                                RentWiseTheme.secondaryText
-                            )
-                    }
-                    .frame(
-                        maxWidth: .infinity,
-                        alignment: .leading
-                    )
-                    .padding(.horizontal)
-
-                    NavigationLink(
-                        destination: AddRentalPropertyView(
-                            viewModel: viewModel
-                        )
-                    ) {
-
-                        PrimaryButton(
-                            title: "Add Rental Property",
-                            icon: "plus.circle.fill"
-                        )
-                    }
-                    .padding(.horizontal)
-
-                    HStack(spacing: 12) {
-
-                        NavigationLink(
-                            destination:
-                                SharedPropertyPreviewView()
-                        ) {
-
-                            DashboardButton(
-                                title: "Shared",
-                                icon: "square.and.arrow.down"
-                            )
-                        }
-
-                        NavigationLink(
-                            destination:
-                                InspectionPlannerView(
-                                    viewModel: viewModel
-                                )
-                        ) {
-
-                            DashboardButton(
-                                title: "Inspections",
-                                icon: "calendar"
-                            )
-                        }
-                    }
-                    .padding(.horizontal)
-
-                    SectionTitle(
-                        title: "Your Shortlist"
-                    )
-                    .padding(.horizontal)
-
-                    if viewModel.rentalProperties.isEmpty {
-
-                        VStack(spacing: 12) {
-
-                            Image(
-                                systemName: "house"
-                            )
-                            .font(
-                                .system(size: 40)
-                            )
-                            .foregroundColor(
-                                                RentWiseTheme.secondaryText
-                            )
-
-                            Text(
-                                "No rental properties saved yet."
-                            )
-                            .foregroundColor(
-                                                RentWiseTheme.secondaryText
-                            )
-                        }
-                        .frame(
-                            maxWidth: .infinity
-                        )
-                        .padding(30)
-                        .background(
-                                            RentWiseTheme.card
-                        )
-                        .cornerRadius(15)
-                        .padding(.horizontal)
-
-                        Spacer()
-
-                    } else {
-
-                        List {
-
-                            ForEach(
-                                viewModel.rentalProperties
-                            ) { property in
-
-                                NavigationLink(
-                                    destination:
-                                        RentalPropertyDetailView(
-                                            viewModel: viewModel,
-                                            property: property
-                                        )
-                                ) {
-
-                                    RentalPropertyCard(
-                                        property: property
-                                    )
-                                }
-                                .listRowBackground(
-                                                    RentWiseTheme.card
-                                )
-                            }
-                            .onDelete { indexSet in
-
-                                for index in indexSet {
-
-                                    let property =
-                                        viewModel
-                                            .rentalProperties[index]
-
-                                    viewModel
-                                        .deleteRentalProperty(
-                                            property
-                                        )
+        List {
+            Section {
+                Text("Find your next place").font(.title2.bold())
+                Text("Share a listing from Safari to Rentwise, then return here to find it in your shortlist.").foregroundStyle(.secondary)
+                Button { showImport = true } label: {
+                    Label("Import listing URL", systemImage: "square.and.arrow.down")
+                }
+            }
+            if viewModel.isImportingListings {
+                Section { ProgressView("Importing shared listings…") }
+            }
+            if !viewModel.importMessage.isEmpty {
+                Section { Text(viewModel.importMessage).foregroundStyle(.red) }
+            }
+            if !viewModel.inspections.isEmpty {
+                Section("Upcoming inspections") {
+                    ForEach(viewModel.inspections) { inspection in
+                        if let property = viewModel.rentalProperties.first(where: { $0.id == inspection.rentalPropertyID }) {
+                            NavigationLink { RentalPropertyDetailView(viewModel: viewModel, property: property) } label: {
+                                VStack(alignment: .leading, spacing: 5) {
+                                    Text(property.address).font(.headline)
+                                    Text(inspection.startTime.formatted()).font(.caption).foregroundStyle(.secondary)
                                 }
                             }
                         }
-                        .listStyle(.plain)
-                        .scrollContentBackground(
-                            .hidden
-                        )
                     }
                 }
-                .padding(.top)
             }
-            .navigationBarHidden(true)
-            .onAppear {
-
-                viewModel.loadRentalProperties()
+            Section("Your shortlist • \(viewModel.rentalProperties.count)") {
+                if viewModel.rentalProperties.isEmpty {
+                    ContentUnavailableView("No saved properties", systemImage: "house", description: Text("Share a listing or import its URL to get started."))
+                }
+                ForEach(viewModel.rentalProperties) { property in
+                    NavigationLink { RentalPropertyDetailView(viewModel: viewModel, property: property) } label: {
+                        VStack(alignment: .leading, spacing: 10) {
+                            if let source = property.sourceURL, let url = URL(string: source) {
+                                ListingLinkPreview(url: url, service: viewModel.listingPreviewService)
+                            }
+                            Label("Saved listing", systemImage: "house.fill").font(.caption).foregroundStyle(.teal)
+                            Text(property.address).font(.headline)
+                            Text(property.rentLabel).font(.subheadline)
+                        }.padding(.vertical, 8)
+                    }
+                    .swipeActions { Button("Delete", role: .destructive) { viewModel.deleteRentalProperty(property) } }
+                }
             }
+            if !viewModel.errorMessage.isEmpty { Text(viewModel.errorMessage).foregroundStyle(.red) }
         }
-        .preferredColorScheme(.dark)
+        .navigationTitle("Rentwise")
+        .sheet(isPresented: $showImport) { ImportListingView(viewModel: viewModel) }
+        .refreshable { await viewModel.retrySharedImports() }
+    }
+}
+
+struct ImportListingView: View {
+    @ObservedObject var viewModel: RentWiseViewModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var link = ""
+    @State private var isSaving = false
+    var body: some View {
+        NavigationStack {
+            Form {
+                TextField("https://…", text: $link).keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled().accessibilityLabel("Listing URL")
+                Button("Save to Shortlist") {
+                    isSaving = true
+                    Task { @MainActor in
+                        let saved = await viewModel.importListingURL(link)
+                        isSaving = false
+                        if saved { dismiss() }
+                    }
+                }.disabled(isSaving || link.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                if isSaving { ProgressView("Importing listing…") }
+                if !viewModel.importMessage.isEmpty { Text(viewModel.importMessage).foregroundStyle(.red) }
+            }
+            .navigationTitle("Import listing")
+            .toolbar { Button("Cancel") { dismiss() }.disabled(isSaving) }
+            .interactiveDismissDisabled(isSaving)
+        }
     }
 }

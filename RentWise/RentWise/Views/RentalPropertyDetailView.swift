@@ -57,7 +57,7 @@ struct RentalPropertyDetailView: View {
                             )
 
                         Text(
-                            "$\(property.weeklyRent, specifier: "%.0f") per week"
+                            property.rentLabel
                         )
                         .font(.headline)
                         .foregroundColor(

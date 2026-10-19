@@ -28,7 +28,7 @@ struct RentWiseApp: App {
     
     var body: some Scene {
         WindowGroup {
-            RentalPropertyListView(
+            RentWiseRootView(
                 viewModel: viewModel
             )
         }
