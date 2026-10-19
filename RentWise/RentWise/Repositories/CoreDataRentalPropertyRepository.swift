@@ -34,6 +34,18 @@ class CoreDataRentalPropertyRepository: RentalPropertyRepository {
         try context.save()
     }
     
+    func update(_ property: RentalProperty) throws {
+        let request = RentalPropertyEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", property.id as CVarArg)
+        guard let entity = try context.fetch(request).first else {
+            throw CoreDataRentalPropertyRepositoryError.rentalPropertyNotFound
+        }
+        entity.address = property.address
+        entity.weeklyRent = property.weeklyRent
+        entity.sourceURL = property.sourceURL
+        try context.save()
+    }
+
     func delete(_ property: RentalProperty) throws {
 
         let request =

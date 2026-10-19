@@ -15,6 +15,7 @@ class RentWiseViewModel: ObservableObject {
     @Published var importMessage = ""
     let listingPreviewService = ListingPreviewService()
     private var attemptedListingImports: Set<String> = []
+    private var attemptedSharedPayloads: Set<UUID> = []
 
 
     @Published var rentalProperties: [RentalProperty] = []
@@ -432,19 +433,32 @@ class RentWiseViewModel: ObservableObject {
 
     func importSharedListings() async {
         guard !isImportingListings else { return }
-        let links = SharedRentalLinkData.loadLinks().filter { !attemptedListingImports.contains($0) }
-        guard !links.isEmpty else { return }
         isImportingListings = true
         importMessage = ""
         defer { isImportingListings = false }
         let useCase = ImportSharedPropertyUseCase(repository: repository)
-        for link in links {
+        do {
+            for (file, listing) in try SharedRentalLinkData.pendingListings() {
+                guard attemptedSharedPayloads.insert(listing.id).inserted else { continue }
+                do {
+                    // Safari already supplied the title and price: save immediately.
+                    _ = try useCase.execute(link: listing.url, title: listing.title, weeklyRent: listing.weeklyRent)
+                    try SharedRentalLinkData.acknowledgeListing(file)
+                    loadRentalProperties()
+                } catch {
+                    importMessage = "A shared listing could not be saved. Pull down to retry."
+                }
+            }
+        } catch {
+            importMessage = "Shared listings could not be read. Check App Group signing or pull down to retry."
+        }
+        // Import any URL-only shares queued by the previous extension version.
+        for link in SharedRentalLinkData.loadLinks() where !attemptedListingImports.contains(link) {
             attemptedListingImports.insert(link)
             do {
                 let url = try ImportSharedPropertyUseCase.validatedURL(link)
                 let metadata = await listingPreviewService.metadata(for: url)
                 _ = try useCase.execute(link: link, title: metadata?.title)
-                // A queued link is acknowledged only after persistence succeeds.
                 SharedRentalLinkData.removeLink(link)
                 loadRentalProperties()
             } catch {
@@ -462,6 +476,7 @@ class RentWiseViewModel: ObservableObject {
     func retrySharedImports() async {
         guard !isImportingListings else { return }
         attemptedListingImports.removeAll()
+        attemptedSharedPayloads.removeAll()
         await refreshShortlist()
     }
 

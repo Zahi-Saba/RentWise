@@ -11,6 +11,8 @@ protocol RentalPropertyRepository {
 
     func save(_ property: RentalProperty) throws
 
+    func update(_ property: RentalProperty) throws
+
     func save(_ inspection: RentalInspection) throws
 
     func save(_ observation: InspectionObservation) throws

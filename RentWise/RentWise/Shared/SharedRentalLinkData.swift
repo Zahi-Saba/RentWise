@@ -91,3 +91,39 @@ struct SharedRentalLinkData {
         )
     }
 }
+
+
+struct SharedListing: Codable, Identifiable {
+    var id = UUID()
+    var url: String
+    var title: String
+    var weeklyRent: Double? = nil
+}
+
+extension SharedRentalLinkData {
+    // Each share is its own atomic file, avoiding a read/modify/write race
+    // between the extension and app. Legacy URL-only queues remain readable.
+    static func inboxDirectory() throws -> URL {
+        guard let container = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroup) else {
+            throw NSError(domain: "Rentwise", code: 1, userInfo: [NSLocalizedDescriptionKey: "Shared storage is unavailable. Check the App Group on both targets."])
+        }
+        let directory = container.appendingPathComponent("ListingInbox", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory
+    }
+    static func saveListing(_ listing: SharedListing, directory: URL? = nil) throws {
+        let folder = try directory ?? inboxDirectory()
+        let file = folder.appendingPathComponent(listing.id.uuidString).appendingPathExtension("json")
+        try JSONEncoder().encode(listing).write(to: file, options: .atomic)
+    }
+    static func pendingListings(directory: URL? = nil) throws -> [(URL, SharedListing)] {
+        let folder = try directory ?? inboxDirectory()
+        return try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)
+            .filter { $0.pathExtension == "json" }
+            .sorted { $0.lastPathComponent < $1.lastPathComponent }
+            .map { ($0, try JSONDecoder().decode(SharedListing.self, from: Data(contentsOf: $0))) }
+    }
+    static func acknowledgeListing(_ file: URL) throws {
+        try FileManager.default.removeItem(at: file)
+    }
+}

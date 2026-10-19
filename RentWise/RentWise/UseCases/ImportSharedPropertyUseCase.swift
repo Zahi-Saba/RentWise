@@ -17,15 +17,19 @@ struct ImportSharedPropertyUseCase {
         return url
     }
 
-    func execute(link: String, title: String?) throws -> RentalProperty {
+    func execute(link: String, title: String?, weeklyRent: Double? = nil) throws -> RentalProperty {
         let url = try Self.validatedURL(link)
-        if let existing = try repository.fetchRentalProperties().first(where: { $0.sourceURL == url.absoluteString }) {
+        if var existing = try repository.fetchRentalProperties().first(where: { $0.sourceURL == url.absoluteString }) {
+            if let weeklyRent, weeklyRent.isFinite, weeklyRent > 0 {
+                existing.weeklyRent = weeklyRent
+                try repository.update(existing)
+            }
             return existing
         }
         let cleanedTitle = title?.trimmingCharacters(in: .whitespacesAndNewlines)
         let property = RentalProperty(
             address: cleanedTitle.flatMap { $0.isEmpty ? nil : $0 } ?? "Listing from \(url.host ?? "website")",
-            weeklyRent: 0,
+            weeklyRent: weeklyRent.flatMap { $0.isFinite && $0 > 0 ? $0 : nil } ?? 0,
             sourceURL: url.absoluteString
         )
         try repository.save(property)

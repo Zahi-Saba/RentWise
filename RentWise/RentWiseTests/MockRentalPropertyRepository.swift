@@ -18,6 +18,13 @@ class MockRentalPropertyRepository: RentalPropertyRepository {
         savedProperties.append(property)
     }
 
+    func update(_ property: RentalProperty) throws {
+        guard let index = savedProperties.firstIndex(where: { $0.id == property.id }) else {
+            throw CoreDataRentalPropertyRepositoryError.rentalPropertyNotFound
+        }
+        savedProperties[index] = property
+    }
+
     func save(_ inspection: RentalInspection) throws {
         savedInspections.append(inspection)
     }
