@@ -22,6 +22,7 @@ class RentWiseViewModel: ObservableObject {
     @Published var inspections: [RentalInspection] = []
     @Published var observations: [InspectionObservation] = []
     @Published var errorMessage: String = ""
+    @Published var propertyInspections: [RentalInspection] = []
     @Published var inspectionHistory: [RentalInspection] = []
     @Published var latestPropertyInspection: RentalInspection?
     @Published var latestPropertyObservations: [InspectionObservation] = []
@@ -198,6 +199,14 @@ class RentWiseViewModel: ObservableObject {
                 "The inspection could not be scheduled. Please try again."
         }
     }
+    func loadPropertyDetails(for propertyID: UUID) {
+        propertyInspections = []
+        loadLatestInspectionNotes(for: propertyID)
+        do {
+            propertyInspections = try FetchPropertyInspectionsUseCase(repository: repository).execute(propertyID: propertyID)
+        } catch { errorMessage = "Property inspections could not be loaded." }
+    }
+
     func loadLatestInspectionNotes(
         for rentalPropertyID: UUID
     ) {
