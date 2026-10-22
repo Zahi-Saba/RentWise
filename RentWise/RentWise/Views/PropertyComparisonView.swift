@@ -1,0 +1,143 @@
+import SwiftUI
+
+struct PropertyComparisonView: View {
+    @ObservedObject var viewModel: RentWiseViewModel
+    @State private var firstID: UUID?
+    @State private var secondID: UUID?
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.scenePhase) private var scenePhase
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 14) {
+                    Label("Find the better fit", systemImage: "rectangle.split.2x1")
+                        .font(.title2.bold())
+                    Text("Choose two saved properties to compare rent and inspection observations.")
+                        .foregroundStyle(.secondary)
+                    if viewModel.rentalProperties.count < 2 {
+                        Label("Save at least two properties to compare.", systemImage: "house")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        selector("Property A", selection: $firstID, excluding: secondID)
+                        selector("Property B", selection: $secondID, excluding: firstID)
+                        Button(action: compare) {
+                            Label("Compare Properties", systemImage: "rectangle.split.2x1")
+                                .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 6)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(firstID == nil || secondID == nil || firstID == secondID)
+                    }
+                }
+                .padding().background(.background, in: RoundedRectangle(cornerRadius: 20))
+
+                if !viewModel.errorMessage.isEmpty {
+                    Text(viewModel.errorMessage).foregroundStyle(.red)
+                }
+                if !viewModel.comparisonError.isEmpty {
+                    Text(viewModel.comparisonError).foregroundStyle(.red)
+                }
+                if let result = viewModel.comparison {
+                    Text(rentSummary(result)).font(.headline)
+                    Text("Observations come from each property's latest inspection with saved notes. Dates may differ; unrecorded items are shown as Not Checked.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                    // Keep rows aligned while allowing large text to grow vertically.
+                    ScrollView(.horizontal) {
+                        comparisonTable(result, width: typeSize.isAccessibilitySize ? 280 : 170)
+                    }
+                    .accessibilityHint("Scroll horizontally to view both properties")
+                }
+            }.padding()
+        }
+        .background(Color(uiColor: .systemGroupedBackground))
+        .tint(.teal)
+        .navigationTitle("Compare")
+        .onAppear(perform: refresh)
+        .onChange(of: scenePhase) { _, phase in if phase == .active { refresh() } }
+        .onChange(of: firstID) { _, _ in viewModel.clearComparison() }
+        .onChange(of: secondID) { _, _ in viewModel.clearComparison() }
+        .refreshable { refresh() }
+    }
+
+    private func selector(_ title: String, selection: Binding<UUID?>, excluding: UUID?) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title).font(.caption.bold()).foregroundStyle(.secondary)
+            Picker(title, selection: selection) {
+                Text("Choose a property").tag(nil as UUID?)
+                ForEach(viewModel.rentalProperties.filter { $0.id != excluding }) {
+                    Text($0.address).tag(Optional($0.id))
+                }
+            }.labelsHidden().pickerStyle(.menu).accessibilityLabel(title)
+        }
+    }
+
+    private func comparisonTable(_ result: PropertyComparison, width: CGFloat) -> some View {
+        Grid(alignment: .topLeading, horizontalSpacing: 16, verticalSpacing: 16) {
+            GridRow {
+                header(result.first, label: "Property A", width: width)
+                header(result.second, label: "Property B", width: width)
+            }
+            ForEach(InspectionCriterion.allCases, id: \.self) { criterion in
+                GridRow {
+                    observationCell(result.first, criterion: criterion, width: width)
+                    observationCell(result.second, criterion: criterion, width: width)
+                }
+            }
+        }.padding().background(.background, in: RoundedRectangle(cornerRadius: 20))
+    }
+
+    private func header(_ item: ComparedProperty, label: String, width: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(label).font(.caption.bold()).foregroundStyle(.teal)
+            Text(item.property.address).font(.headline)
+            Text(item.property.rentLabel).font(.title3.bold())
+            if let inspection = item.inspection {
+                Text("Inspection: \(inspection.startTime.formatted(date: .abbreviated, time: .shortened))")
+                    .font(.caption).foregroundStyle(.secondary)
+            } else {
+                Text("No recorded observations").font(.caption).foregroundStyle(.secondary)
+            }
+            NavigationLink("Open property") {
+                RentalPropertyDetailView(viewModel: viewModel, property: item.property)
+            }
+            .accessibilityLabel("Open \(item.property.address)")
+        }.frame(width: width, alignment: .leading)
+    }
+
+    private func observationCell(_ item: ComparedProperty, criterion: InspectionCriterion, width: CGFloat) -> some View {
+        let observation = item.observation(for: criterion)
+        let status = observation?.status ?? .notChecked
+        return VStack(alignment: .leading, spacing: 8) {
+            Divider()
+            Text(criterion.displayName).font(.headline)
+            Label(status.displayName, systemImage: status.symbol)
+                .foregroundStyle(status.color).font(.subheadline)
+            if let observation, !observation.notes.isEmpty {
+                Text(observation.notes).font(.subheadline).foregroundStyle(.secondary)
+            }
+        }
+        .frame(width: width, alignment: .leading)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(item.property.address), \(criterion.displayName), \(status.displayName). \(observation?.notes ?? "")")
+    }
+
+    private func rentSummary(_ result: PropertyComparison) -> String {
+        guard let difference = result.weeklyRentDifference else { return "Rent difference unavailable until both rents are supplied." }
+        if difference == 0 { return "Both properties have the same weekly rent." }
+        let amount = String(format: "$%.2f", abs(difference))
+        return "Property \(difference < 0 ? "A" : "B") costs \(amount) less per week."
+    }
+
+    private func compare() {
+        guard let firstID, let secondID else { return }
+        viewModel.compareProperties(firstID: firstID, secondID: secondID)
+    }
+
+    private func refresh() {
+        viewModel.loadRentalProperties()
+        let ids = Set(viewModel.rentalProperties.map(\.id))
+        if let id = firstID, !ids.contains(id) { firstID = nil }
+        if let id = secondID, !ids.contains(id) { secondID = nil }
+        if firstID != nil && secondID != nil { compare() } else { viewModel.clearComparison() }
+    }
+}

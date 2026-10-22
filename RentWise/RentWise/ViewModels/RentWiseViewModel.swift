@@ -11,6 +11,8 @@ import WidgetKit
 import LinkPresentation
 
 class RentWiseViewModel: ObservableObject {
+    @Published private(set) var comparison: PropertyComparison?
+    @Published private(set) var comparisonError = ""
     @Published var isImportingListings = false
     @Published var importMessage = ""
     let listingPreviewService = ListingPreviewService()
@@ -63,6 +65,23 @@ class RentWiseViewModel: ObservableObject {
                         repository: repository
                     )
         
+    }
+
+    func clearComparison() {
+        comparison = nil
+        comparisonError = ""
+    }
+
+    func compareProperties(firstID: UUID, secondID: UUID) {
+        clearComparison()
+        do {
+            comparison = try ComparePropertiesUseCase(repository: repository)
+                .execute(firstID: firstID, secondID: secondID)
+        } catch let error as ComparePropertiesError {
+            comparisonError = error.localizedDescription
+        } catch {
+            comparisonError = "The comparison could not be loaded. Please try again."
+        }
     }
 
     func loadRentalProperties() {

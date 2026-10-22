@@ -9,7 +9,7 @@ struct RentWiseRootView: View {
                 .tabItem { Label("Shortlist", systemImage: "house.fill") }
             NavigationStack { Color(uiColor: .systemGroupedBackground).ignoresSafeArea().navigationTitle("Map") }
                 .tabItem { Label("Map", systemImage: "map") }
-            NavigationStack { Color(uiColor: .systemGroupedBackground).ignoresSafeArea().navigationTitle("Compare") }
+            NavigationStack { PropertyComparisonView(viewModel: viewModel) }
                 .tabItem { Label("Compare", systemImage: "rectangle.split.2x1") }
             NavigationStack { Color(uiColor: .systemGroupedBackground).ignoresSafeArea().navigationTitle("Report") }
                 .tabItem { Label("Report", systemImage: "doc.text") }
