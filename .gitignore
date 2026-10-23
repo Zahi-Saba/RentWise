@@ -1,0 +1,14 @@
+# macOS metadata
+.DS_Store
+
+# Xcode personal settings (keep shared schemes tracked)
+xcuserdata/
+*.xcuserstate
+
+# Generated build and test output
+/build/
+/DerivedData/
+*.xcresult
+
+# Local project archive
+/RentWise.zip
