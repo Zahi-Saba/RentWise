@@ -4,11 +4,10 @@ import MapKit
 
 struct PropertyMapView: View {
 
-    let pins: [PropertyMapPin]
+    let properties: [RentalProperty]
 
-    init(pins: [PropertyMapPin] = []) {
-        self.pins = pins
-    }
+    @State private var pins: [PropertyMapPin] = []
+    @State private var isLoading = false
 
     @State private var cameraPosition: MapCameraPosition = .region(
         MKCoordinateRegion(
@@ -34,6 +33,70 @@ struct PropertyMapView: View {
         }
         .navigationTitle("Map")
         .navigationBarTitleDisplayMode(.inline)
+        .overlay(alignment: .top) {
+            if isLoading {
+                ProgressView("Loading property locations...")
+                    .padding()
+                    .background(
+                        .regularMaterial,
+                        in: RoundedRectangle(cornerRadius: 12)
+                    )
+                    .padding()
+            }
+        }
+        .task(id: properties.map { "\($0.id)-\($0.address)" }) {
+            await loadPropertyLocations()
+        }
+    }
+
+    @MainActor
+    private func loadPropertyLocations() async {
+
+        isLoading = true
+        defer { isLoading = false }
+
+        let geocodingService = PropertyGeocodingService()
+        var loadedPins: [PropertyMapPin] = []
+
+        for property in properties {
+
+            if Task.isCancelled {
+                return
+            }
+
+            do {
+                if let coordinate = try await geocodingService.coordinate(
+                    for: property.address
+                ) {
+                    loadedPins.append(
+                        PropertyMapPin(
+                            property: property,
+                            coordinate: coordinate
+                        )
+                    )
+                }
+            } catch {
+                print("Could not find location for \(property.address): \(error)")
+            }
+        }
+
+        if Task.isCancelled {
+            return
+        }
+
+        pins = loadedPins
+
+        if let firstPin = loadedPins.first {
+            cameraPosition = .region(
+                MKCoordinateRegion(
+                    center: firstPin.coordinate,
+                    span: MKCoordinateSpan(
+                        latitudeDelta: 0.05,
+                        longitudeDelta: 0.05
+                    )
+                )
+            )
+        }
     }
 }
 
@@ -48,26 +111,14 @@ struct PropertyMapPin: Identifiable {
 
 #Preview {
     NavigationStack {
-        PropertyMapView(pins: [
-            PropertyMapPin(
-                property: RentalProperty(
-                    address: "Sydney CBD",
-                    weeklyRent: 650
-                ),
-                coordinate: CLLocationCoordinate2D(
-                    latitude: -33.8731,
-                    longitude: 151.2066
-                )
+        PropertyMapView(properties: [
+            RentalProperty(
+                address: "1 Martin Place, Sydney NSW 2000",
+                weeklyRent: 650
             ),
-            PropertyMapPin(
-                property: RentalProperty(
-                    address: "Central Station",
-                    weeklyRent: 750
-                ),
-                coordinate: CLLocationCoordinate2D(
-                    latitude: -33.8830,
-                    longitude: 151.2065
-                )
+            RentalProperty(
+                address: "483 George Street, Sydney NSW 2000",
+                weeklyRent: 750
             )
         ])
     }
