@@ -8,6 +8,7 @@ struct PropertyMapView: View {
 
     @State private var pins: [PropertyMapPin] = []
     @State private var isLoading = false
+    @State private var failedAddressCount = 0
 
     @State private var cameraPosition: MapCameraPosition = .region(
         MKCoordinateRegion(
@@ -42,6 +43,21 @@ struct PropertyMapView: View {
                         in: RoundedRectangle(cornerRadius: 12)
                     )
                     .padding()
+            } else if properties.isEmpty {
+                statusMessage(
+                    "No saved properties to display.",
+                    icon: "mappin.slash"
+                )
+            } else if pins.isEmpty {
+                statusMessage(
+                    "Could not find any property locations. Check the saved addresses.",
+                    icon: "exclamationmark.triangle"
+                )
+            } else if failedAddressCount > 0 {
+                statusMessage(
+                    "\(failedAddressCount) property location(s) could not be found.",
+                    icon: "exclamationmark.triangle"
+                )
             }
         }
         .task(id: properties.map { "\($0.id)-\($0.address)" }) {
@@ -49,14 +65,37 @@ struct PropertyMapView: View {
         }
     }
 
+    private func statusMessage(
+        _ message: String,
+        icon: String
+    ) -> some View {
+        Label(message, systemImage: icon)
+            .font(.subheadline)
+            .padding()
+            .background(
+                .regularMaterial,
+                in: RoundedRectangle(cornerRadius: 12)
+            )
+            .padding()
+    }
+
     @MainActor
     private func loadPropertyLocations() async {
+
+        pins = []
+        failedAddressCount = 0
+
+        guard !properties.isEmpty else {
+            isLoading = false
+            return
+        }
 
         isLoading = true
         defer { isLoading = false }
 
         let geocodingService = PropertyGeocodingService()
         var loadedPins: [PropertyMapPin] = []
+        var failedCount = 0
 
         for property in properties {
 
@@ -64,9 +103,18 @@ struct PropertyMapView: View {
                 return
             }
 
+            let address = property.address.trimmingCharacters(
+                in: .whitespacesAndNewlines
+            )
+
+            if address.isEmpty {
+                failedCount += 1
+                continue
+            }
+
             do {
                 if let coordinate = try await geocodingService.coordinate(
-                    for: property.address
+                    for: address
                 ) {
                     loadedPins.append(
                         PropertyMapPin(
@@ -74,9 +122,16 @@ struct PropertyMapView: View {
                             coordinate: coordinate
                         )
                     )
+                } else {
+                    failedCount += 1
                 }
             } catch {
-                print("Could not find location for \(property.address): \(error)")
+                if Task.isCancelled {
+                    return
+                }
+
+                failedCount += 1
+                print("Could not locate \(address): \(error)")
             }
         }
 
@@ -85,6 +140,7 @@ struct PropertyMapView: View {
         }
 
         pins = loadedPins
+        failedAddressCount = failedCount
 
         if let firstPin = loadedPins.first {
             cameraPosition = .region(
@@ -119,6 +175,10 @@ struct PropertyMapPin: Identifiable {
             RentalProperty(
                 address: "483 George Street, Sydney NSW 2000",
                 weeklyRent: 750
+            ),
+            RentalProperty(
+                address: "   ",
+                weeklyRent: 450
             )
         ])
     }
