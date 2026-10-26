@@ -9,8 +9,16 @@ struct RentWiseRootView: View {
         TabView {
             NavigationStack { RentalPropertyListView(viewModel: viewModel) }
                 .tabItem { Label("Shortlist", systemImage: "house.fill") }
-            NavigationStack { Color(uiColor: .systemGroupedBackground).ignoresSafeArea().navigationTitle("Map") }
-                .tabItem { Label("Map", systemImage: "map") }
+            
+            NavigationStack {
+                PropertyMapView(
+                    properties: viewModel.rentalProperties
+                )
+            }
+            .tabItem {
+                Label("Map", systemImage: "map")
+            }
+
             NavigationStack { PropertyComparisonView(viewModel: viewModel) }
                 .tabItem { Label("Compare", systemImage: "rectangle.split.2x1") }
             NavigationStack { InspectionReportsView(viewModel: reportsViewModel)}
