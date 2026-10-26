@@ -7,6 +7,7 @@ struct PropertyMapView: View {
     let properties: [RentalProperty]
 
     @State private var pins: [PropertyMapPin] = []
+    @State private var selectedPropertyID: UUID?
     @State private var isLoading = false
     @State private var failedAddressCount = 0
 
@@ -23,13 +24,21 @@ struct PropertyMapView: View {
         )
     )
 
+    private var selectedPin: PropertyMapPin? {
+        pins.first { $0.id == selectedPropertyID }
+    }
+
     var body: some View {
-        Map(position: $cameraPosition) {
+        Map(
+            position: $cameraPosition,
+            selection: $selectedPropertyID
+        ) {
             ForEach(pins) { pin in
                 Marker(
                     pin.property.address,
                     coordinate: pin.coordinate
                 )
+                .tag(pin.id)
             }
         }
         .navigationTitle("Map")
@@ -50,7 +59,7 @@ struct PropertyMapView: View {
                 )
             } else if pins.isEmpty {
                 statusMessage(
-                    "Could not find any property locations. Check the saved addresses.",
+                    "Could not find any property locations.",
                     icon: "exclamationmark.triangle"
                 )
             } else if failedAddressCount > 0 {
@@ -60,9 +69,48 @@ struct PropertyMapView: View {
                 )
             }
         }
+        .safeAreaInset(edge: .bottom) {
+            if let selectedPin {
+                propertyCard(for: selectedPin)
+            }
+        }
         .task(id: properties.map { "\($0.id)-\($0.address)" }) {
             await loadPropertyLocations()
         }
+    }
+
+    private func propertyCard(
+        for pin: PropertyMapPin
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top) {
+                Text(pin.property.address)
+                    .font(.headline)
+
+                Spacer()
+
+                Button {
+                    selectedPropertyID = nil
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title3)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Close property details")
+            }
+
+            Text(pin.property.rentLabel)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            .regularMaterial,
+            in: RoundedRectangle(cornerRadius: 16)
+        )
+        .padding(.horizontal)
+        .padding(.bottom, 8)
     }
 
     private func statusMessage(
@@ -81,8 +129,8 @@ struct PropertyMapView: View {
 
     @MainActor
     private func loadPropertyLocations() async {
-
         pins = []
+        selectedPropertyID = nil
         failedAddressCount = 0
 
         guard !properties.isEmpty else {
@@ -98,7 +146,6 @@ struct PropertyMapView: View {
         var failedCount = 0
 
         for property in properties {
-
             if Task.isCancelled {
                 return
             }
@@ -175,10 +222,6 @@ struct PropertyMapPin: Identifiable {
             RentalProperty(
                 address: "483 George Street, Sydney NSW 2000",
                 weeklyRent: 750
-            ),
-            RentalProperty(
-                address: "   ",
-                weeklyRent: 450
             )
         ])
     }
