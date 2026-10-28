@@ -2,6 +2,8 @@ import SwiftUI
 
 struct RentalPropertyListView: View {
     @ObservedObject var viewModel: RentWiseViewModel
+    @AppStorage("appAppearance") private var appearance = "System"
+    @Environment(\.colorScheme) private var colorScheme
     @State private var showImport = false
     var body: some View {
         List {
@@ -51,6 +53,24 @@ struct RentalPropertyListView: View {
                 }
             }
             if !viewModel.errorMessage.isEmpty { Text(viewModel.errorMessage).foregroundStyle(.red) }
+            Section {
+                HStack {
+                    Spacer()
+                    Button {
+                        appearance = colorScheme == .dark ? "Light" : "Dark"
+                    } label: {
+                        Image(systemName: colorScheme == .dark ? "sun.max.fill" : "moon.fill")
+                            .font(.title2)
+                            .frame(width: 48, height: 48)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.teal)
+                    .accessibilityLabel(colorScheme == .dark ? "Switch to light mode" : "Switch to dark mode")
+                    Spacer()
+                }
+            }
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
         }
         .navigationTitle("Rentwise")
         .sheet(isPresented: $showImport) { ImportListingView(viewModel: viewModel) }
