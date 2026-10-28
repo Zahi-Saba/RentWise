@@ -31,8 +31,10 @@ struct InspectionReportPDFRenderer: InspectionReportPDFRendering {
         let headingFont = UIFont.boldSystemFont(ofSize: 13)
 
         // Generate a unique temporary PDF file
-        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("RentWise-Condition-\(UUID().uuidString)").appendingPathExtension("pdf")
+        let fileStore = InspectionReportFileStore()
+        let fileURL = try fileStore.makeOutputURL(for: report)
         let pdfRenderer = UIGraphicsPDFRenderer(bounds: paper)
+        
         try pdfRenderer.writePDF(to: fileURL) { context in
             var y: CGFloat = 0
             var pageNumber = 0
