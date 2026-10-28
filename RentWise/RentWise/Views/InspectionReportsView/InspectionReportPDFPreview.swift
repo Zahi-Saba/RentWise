@@ -21,8 +21,17 @@ struct InspectionReportPDFPreview: View {
             PDFDocumentView(url: url)
                 .navigationTitle("Condition Report")
                 .navigationBarTitleDisplayMode(.inline)
+            
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
+                        ShareLink(item: InspectionReportShareItem(fileURL: url), preview: SharePreview("RentWise Condition Report")) {
+                            Image(systemName: "square.and.arrow.up")
+                        }
+                        .accessibilityLabel("Share condition report")
+                        .accessibilityHint("Opens options to share or save the PDF report.")
+                    }
+                    
+                    ToolbarItem(placement: .confirmationAction) {
                         Button("Done") {
                             dismiss()
                         }
