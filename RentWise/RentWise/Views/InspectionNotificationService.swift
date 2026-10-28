@@ -7,20 +7,34 @@ class InspectionNotificationService {
     private let notificationCenter = UNUserNotificationCenter.current()
 
     func requestPermission() async throws -> Bool {
-        return try await notificationCenter.requestAuthorization(
-            options: [.alert, .sound]
-        )
+        let settings = await notificationCenter.notificationSettings()
+
+        switch settings.authorizationStatus {
+        case .authorized, .provisional, .ephemeral:
+            return true
+
+        case .denied:
+            return false
+
+        case .notDetermined:
+            return try await notificationCenter.requestAuthorization(
+                options: [.alert, .sound]
+            )
+
+        @unknown default:
+            return false
+        }
     }
 
     func scheduleReminder(
         for inspection: RentalInspection,
         propertyAddress: String
-    ) async throws {
+    ) async throws -> Bool {
 
         let reminderDate = inspection.startTime.addingTimeInterval(-30 * 60)
 
         guard reminderDate > Date() else {
-            return
+            return false
         }
 
         let content = UNMutableNotificationContent()
@@ -45,5 +59,6 @@ class InspectionNotificationService {
         )
 
         try await notificationCenter.add(request)
+        return true
     }
 }

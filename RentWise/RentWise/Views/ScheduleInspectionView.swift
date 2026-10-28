@@ -89,7 +89,7 @@ struct ScheduleInspectionView: View {
 
         isScheduling = true
 
-        Task {
+        Task { @MainActor in
             var message = "Your inspection has been saved."
 
             let reminderDate = inspection.startTime.addingTimeInterval(-30 * 60)
@@ -103,17 +103,24 @@ struct ScheduleInspectionView: View {
                     let allowed = try await service.requestPermission()
 
                     if allowed {
-                        try await service.scheduleReminder(
+                        let scheduled = try await service.scheduleReminder(
                             for: inspection,
                             propertyAddress: property.address
                         )
 
-                        message += " You'll receive a reminder 30 minutes before it starts."
+                        if scheduled {
+                            message += " A reminder has been scheduled for 30 minutes before the inspection."
+                        } else {
+                            message += " The reminder time has already passed, so no notification was scheduled."
+                        }
+
                     } else {
                         message += " Notifications are disabled, so no reminder was set."
                     }
+
                 } catch {
                     message += " The notification reminder could not be scheduled."
+                    print("Notification error: \(error)")
                 }
             }
 
