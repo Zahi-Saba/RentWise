@@ -32,7 +32,6 @@ final class InspectionReportsViewModel: ObservableObject {
     // Determines whether the selected inspection is ready for report generation
     var canGenerateReport: Bool {selectedOption?.canGenerateReport == true && !isGenerating}
 
-
     private let listReportsUseCase: ListInspectionReportOptionsUseCase
     private let createReportUseCase: CreateInspectionConditionReportUseCase
     private let pdfRenderer: any InspectionReportPDFRendering

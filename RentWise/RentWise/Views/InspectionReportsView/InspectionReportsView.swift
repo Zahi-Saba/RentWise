@@ -44,7 +44,8 @@ struct InspectionReportsView: View {
             // Available inspections
             Section("Available Inspections") {
                 if viewModel.reportOptions.isEmpty {
-                    ContentUnavailableView("No inspections available", systemImage: "clipboard",
+                    ContentUnavailableView("No inspections available",
+                                           systemImage: "clipboard",
                                            description: Text(
                                             "Save a property and schedule an " +
                                             "inspection to get started."
@@ -76,9 +77,7 @@ struct InspectionReportsView: View {
                         }
                         
                         Text(
-                            viewModel.isGenerating
-                            ? "Generating Report..."
-                            : "Generate PDF Report"
+                            viewModel.isGenerating ? "Generating Report...": "Generate PDF Report"
                         )
                         .font(.headline)
                         
@@ -102,6 +101,7 @@ struct InspectionReportsView: View {
             }
         }
         .navigationTitle("Reports")
+        
         .onAppear {
             viewModel.loadReportOptions()
         }
@@ -113,16 +113,11 @@ struct InspectionReportsView: View {
         
         // PDF preview
         .sheet(item: $viewModel.generatedReport) { report in
-            InspectionReportPDFPreview(
-                url: report.url
-            )
+            InspectionReportPDFPreview(url: report.url)
         }
         
         // Error handling
-        .alert(
-            "Unable to Generate Report",
-            isPresented: showingError
-        ) {
+        .alert("Unable to Generate Report", isPresented: showingError) {
             Button("OK", role: .cancel) {
                 viewModel.clearError()
             }

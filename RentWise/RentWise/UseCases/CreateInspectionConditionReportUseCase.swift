@@ -16,7 +16,7 @@ struct CreateInspectionConditionReportUseCase {
 
     func execute(propertyID: UUID, inspectionID: UUID, generatedAt: Date = Date()) throws -> InspectionConditionReport {
         // Find the selected property
-        guard let property = try repository.fetchRentalProperties().first(where: { $0.id == propertyID }) else {
+        guard let property = try repository.fetchRentalProperties().first(where: {$0.id == propertyID}) else {
             throw CreateInspectionConditionReportError.propertyNotFound
         }
 

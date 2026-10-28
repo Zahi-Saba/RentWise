@@ -45,8 +45,7 @@ struct ListInspectionReportOptionsUseCase {
         }
 
         // Show the most recent inspections first
-        return options.sorted {
-            $0.inspection.startTime > $1.inspection.startTime
-        }
+        return options.sorted {$0.inspection.startTime > $1.inspection.startTime
+}
     }
 }

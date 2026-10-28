@@ -26,16 +26,14 @@ struct InspectionReportFileStore {
         // Generate a safe property-address filename
         let addressPart = safeFilenamePart(report.property.address)
 
-        // Include the inspection date.
+        // Include the inspection date
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = "yyyy-MM-dd-HHmm"
-
         let inspectionDate = dateFormatter.string(from: report.inspection.startTime)
 
         // Prevent collisions when generating multiple reports
         let uniquePart = String(UUID().uuidString.prefix(8))
-
         let filename = "RentWise-Condition-\(addressPart)-" + "\(inspectionDate)-\(uniquePart).pdf"
 
         return folder.appendingPathComponent(filename, isDirectory: false)

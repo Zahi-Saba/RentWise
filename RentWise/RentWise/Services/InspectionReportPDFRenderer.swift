@@ -16,7 +16,7 @@ protocol InspectionReportPDFRendering {
 @MainActor
 struct InspectionReportPDFRenderer: InspectionReportPDFRendering {
     func render(_ report: InspectionConditionReport) throws -> URL {
-        // A4 paper size in PDF points
+        // Create A4 paper size in PDF format
         let paper = CGRect(x: 0, y: 0, width: 595, height: 842)
         let margin: CGFloat = 48
         let usableWidth = paper.width - margin * 2
@@ -46,21 +46,16 @@ struct InspectionReportPDFRenderer: InspectionReportPDFRendering {
                 y = margin
 
                 let headerAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.boldSystemFont(ofSize: 12), .foregroundColor: accent]
+                
                 ("RENTWISE  /  CONDITION REPORT" as NSString).draw(at: CGPoint(x: margin, y: y), withAttributes: headerAttributes)
 
                 // Header divider
                 context.cgContext.setFillColor(accent.cgColor)
-                context.cgContext.fill(
-                    CGRect(
-                        x: margin,
-                        y: y + 27,
-                        width: usableWidth,
-                        height: 1
-                    )
-                )
+                context.cgContext.fill(CGRect(x: margin, y: y + 27, width: usableWidth, height: 1))
 
                 // Footer with page number
                 let footerAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.systemFont(ofSize: 9), .foregroundColor: secondaryInk]
+                
                 ("User-recorded observations  •  Page \(pageNumber)" as NSString).draw(at: CGPoint(x: margin, y: paper.height - 37), withAttributes: footerAttributes)
                 y += 49
             }
@@ -75,6 +70,7 @@ struct InspectionReportPDFRenderer: InspectionReportPDFRendering {
             // Text wrapping
             func wrappedLines(_ text: String, font: UIFont, width: CGFloat) -> [String] {
                 let attributes: [NSAttributedString.Key: Any] = [.font: font]
+                
                 func fits(_ candidate: String) -> Bool {
                     (candidate as NSString).size(withAttributes: attributes).width <= width
                 }
@@ -174,7 +170,7 @@ struct InspectionReportPDFRenderer: InspectionReportPDFRendering {
 
             write("INSPECTION FINDINGS", font: headingFont, color: accent, gap: 12)
 
-            // Include all inspection criteria, even if not recorded
+            // Include all inspection criteria even if not recorded
             for criterion in InspectionCriterion.allCases {
                 let findings = report.observations.filter {$0.criterion == criterion}
 
@@ -185,7 +181,6 @@ struct InspectionReportPDFRenderer: InspectionReportPDFRendering {
 
                 if findings.isEmpty {
                     write("Status: Not recorded", color: secondaryInk, indent: 12, gap: 12)
-                    
                     continue
                 }
 
