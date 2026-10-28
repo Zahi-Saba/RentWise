@@ -21,6 +21,18 @@ final class InspectionReportsViewModel: ObservableObject {
     @Published private(set) var errorMessage: String?
     @Published private(set) var isGenerating = false
 
+    //Returns the inspection currently selected by the user
+    var selectedOption: InspectionReportOption? {
+        guard let selectedInspectionID else {
+            return nil
+        }
+        return reportOptions.first {$0.id == selectedInspectionID}
+    }
+    
+    // Determines whether the selected inspection is ready for report generation
+    var canGenerateReport: Bool {selectedOption?.canGenerateReport == true && !isGenerating}
+
+
     private let listReportsUseCase: ListInspectionReportOptionsUseCase
     private let createReportUseCase: CreateInspectionConditionReportUseCase
     private let pdfRenderer: any InspectionReportPDFRendering

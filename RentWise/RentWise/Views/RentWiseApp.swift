@@ -11,6 +11,7 @@ import CoreData
 struct RentWiseApp: App {
     
     @StateObject private var viewModel: RentWiseViewModel
+    @StateObject private var reportsViewModel: InspectionReportsViewModel
     
     init() {
         let context = PersistenceController.shared.container.viewContext
@@ -24,12 +25,19 @@ struct RentWiseApp: App {
                 repository: repository
             )
         )
+        
+        _reportsViewModel = StateObject(
+            wrappedValue: InspectionReportsViewModel(
+                repository: repository
+            )
+        )
     }
     
     var body: some Scene {
         WindowGroup {
             RentWiseRootView(
-                viewModel: viewModel
+                viewModel: viewModel,
+                reportsViewModel: reportsViewModel
             )
         }
     }
