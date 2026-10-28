@@ -111,4 +111,31 @@ struct CreateInspectionConditionReportUseCaseTests {
 
         #expect(report.observations.map(\.criterion) == [InspectionCriterion.noise, .storage])
     }
+
+    // Test for checking no observations cannot generate reports
+    @Test func preventsReportGenerationWithoutObservations() throws {
+        let repository = MockRentalPropertyRepository()
+        let property = RentalProperty(address: "45 Pitt Street", weeklyRent: 600)
+        let inspection = RentalInspection(rentalPropertyID: property.id, startTime: Date(), endTime: Date().addingTimeInterval(3600))
+        
+        repository.savedProperties = [property]
+        repository.savedInspections = [inspection]
+        
+        let options = try ListInspectionReportOptionsUseCase(repository: repository).execute()
+        
+        let option = try #require(options.first)
+        
+        #expect(option.observationCount == 0)
+        #expect(!option.canGenerateReport)
+    }
+    
+    // Test to check no properties produces an empty report list
+    @Test func returnsEmptyListWhenNoPropertiesExist() throws {
+        let repository = MockRentalPropertyRepository()
+        let useCase = ListInspectionReportOptionsUseCase(repository: repository)
+        let options = try useCase.execute()
+
+        #expect(options.isEmpty)
+    }
+    
 }
