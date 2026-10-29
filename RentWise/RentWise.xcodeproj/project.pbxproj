@@ -26,13 +26,6 @@
 			remoteGlobalIDString = 60E6D88030872703006E2A32;
 			remoteInfo = RentWise;
 		};
-		60E6D89930872704006E2A32 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 60E6D87930872703006E2A32 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 60E6D88030872703006E2A32;
-			remoteInfo = RentWise;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -52,7 +45,6 @@
 		60E6D88130872703006E2A32 /* RentWise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RentWise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		60E6D88830872704006E2A32 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		60E6D88E30872704006E2A32 /* RentWiseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RentWiseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		60E6D89830872704006E2A32 /* RentWiseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RentWiseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -112,11 +104,6 @@
 			files = (
 			);
 		};
-		60E6D89530872704006E2A32 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			files = (
-			);
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -136,7 +123,6 @@
 			children = (
 				60E6D88130872703006E2A32 /* RentWise.app */,
 				60E6D88E30872704006E2A32 /* RentWiseTests.xctest */,
-				60E6D89830872704006E2A32 /* RentWiseUITests.xctest */,
 				603BFE5B308DEEAC0085FB11 /* RentWiseShare.appex */,
 			);
 			name = Products;
@@ -206,24 +192,6 @@
 			productReference = 60E6D88E30872704006E2A32 /* RentWiseTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		60E6D89730872704006E2A32 /* RentWiseUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 60E6D8A630872704006E2A32 /* Build configuration list for PBXNativeTarget "RentWiseUITests" */;
-			buildPhases = (
-				60E6D89430872704006E2A32 /* Sources */,
-				60E6D89530872704006E2A32 /* Frameworks */,
-				60E6D89630872704006E2A32 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				60E6D89A30872704006E2A32 /* PBXTargetDependency */,
-			);
-			name = RentWiseUITests;
-			productName = RentWiseUITests;
-			productReference = 60E6D89830872704006E2A32 /* RentWiseUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -241,10 +209,6 @@
 						CreatedOnToolsVersion = 27.0;
 					};
 					60E6D88D30872704006E2A32 = {
-						CreatedOnToolsVersion = 27.0;
-						TestTargetID = 60E6D88030872703006E2A32;
-					};
-					60E6D89730872704006E2A32 = {
 						CreatedOnToolsVersion = 27.0;
 						TestTargetID = 60E6D88030872703006E2A32;
 					};
@@ -266,7 +230,6 @@
 			targets = (
 				60E6D88030872703006E2A32 /* RentWise */,
 				60E6D88D30872704006E2A32 /* RentWiseTests */,
-				60E6D89730872704006E2A32 /* RentWiseUITests */,
 				603BFE5A308DEEAC0085FB11 /* RentWiseShare */,
 			);
 		};
@@ -289,11 +252,6 @@
 			files = (
 			);
 		};
-		60E6D89630872704006E2A32 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			files = (
-			);
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -312,11 +270,6 @@
 			files = (
 			);
 		};
-		60E6D89430872704006E2A32 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			files = (
-			);
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -329,11 +282,6 @@
 			isa = PBXTargetDependency;
 			target = 60E6D88030872703006E2A32 /* RentWise */;
 			targetProxy = 60E6D88F30872704006E2A32 /* PBXContainerItemProxy */;
-		};
-		60E6D89A30872704006E2A32 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 60E6D88030872703006E2A32 /* RentWise */;
-			targetProxy = 60E6D89930872704006E2A32 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -625,44 +573,6 @@
 			};
 			name = Release;
 		};
-		60E6D8A730872704006E2A32 /* Debug configuration for PBXNativeTarget "RentWiseUITests" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ZahiOrg.RentWiseUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = RentWise;
-			};
-			name = Debug;
-		};
-		60E6D8A830872704006E2A32 /* Release configuration for PBXNativeTarget "RentWiseUITests" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ZahiOrg.RentWiseUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = RentWise;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -695,14 +605,6 @@
 			buildConfigurations = (
 				60E6D8A430872704006E2A32 /* Debug configuration for PBXNativeTarget "RentWiseTests" */,
 				60E6D8A530872704006E2A32 /* Release configuration for PBXNativeTarget "RentWiseTests" */,
-			);
-			defaultConfigurationName = Release;
-		};
-		60E6D8A630872704006E2A32 /* Build configuration list for PBXNativeTarget "RentWiseUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				60E6D8A730872704006E2A32 /* Debug configuration for PBXNativeTarget "RentWiseUITests" */,
-				60E6D8A830872704006E2A32 /* Release configuration for PBXNativeTarget "RentWiseUITests" */,
 			);
 			defaultConfigurationName = Release;
 		};
