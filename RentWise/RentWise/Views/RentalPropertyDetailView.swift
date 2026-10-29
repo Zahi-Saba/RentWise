@@ -3,7 +3,8 @@ import SwiftUI
 struct RentalPropertyDetailView: View {
     @ObservedObject var viewModel: RentWiseViewModel
     let property: RentalProperty
-
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    
     private var currentProperty: RentalProperty {
         viewModel.rentalProperties.first { $0.id == property.id } ?? property
     }
@@ -33,7 +34,11 @@ struct RentalPropertyDetailView: View {
                 }
                 Label("Saved property", systemImage: "bookmark.fill")
                     .font(.caption.weight(.semibold)).foregroundStyle(Color.accentColor)
-                Text(currentProperty.address).font(.title3.bold()).textSelection(.enabled)
+                Text(currentProperty.address)
+                    .font(.title3.bold())
+                    .fixedSize(horizontal: false, vertical: true)
+                    .textSelection(.enabled)
+                
                 if currentProperty.weeklyRent <= 0, currentProperty.sourceURL != nil {
                     Text("To update the rent, open the listing in Safari and share it to Rentwise again after the weekly price loads.")
                         .font(.footnote).foregroundStyle(.secondary)
@@ -89,14 +94,45 @@ struct RentalPropertyDetailView: View {
         .onAppear { viewModel.loadPropertyDetails(for: property.id) }
     }
 
+
+    // Displays the weekly rent using a layout that adapts to the user's preferred Dynamic Type size
     private var rentHeading: some View {
-        HStack(alignment: .firstTextBaseline) {
-            Text(currentProperty.rentLabel).font(.title.bold()).foregroundStyle(.primary)
-            Spacer(minLength: 8)
-            if currentProperty.sourceURL != nil {
-                Image(systemName: "arrow.up.right").foregroundStyle(Color.accentColor).accessibilityHidden(true)
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 8) {
+                    rentAmountText
+
+                    if currentProperty.sourceURL != nil {
+                        Label(
+                            "Open original listing",
+                            systemImage: "arrow.up.right"
+                        )
+                        .font(.subheadline)
+                        .foregroundStyle(Color.accentColor)
+                        .accessibilityHidden(true)
+                    }
+                }
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    rentAmountText
+
+                    Spacer(minLength: 8)
+
+                    if currentProperty.sourceURL != nil {
+                        Image(systemName: "arrow.up.right")
+                            .foregroundStyle(Color.accentColor)
+                            .accessibilityHidden(true)
+                    }
+                }
             }
         }
+    }
+
+    private var rentAmountText: some View {
+        Text(currentProperty.rentLabel)
+            .font(.title.bold())
+            .foregroundStyle(.primary)
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     private func observationRow(_ criterion: InspectionCriterion) -> some View {
@@ -107,7 +143,10 @@ struct RentalPropertyDetailView: View {
             Label(statusLabel(status), systemImage: statusIcon(status))
                 .font(.subheadline).foregroundStyle(statusColor(status))
             if let observation, !observation.notes.isEmpty {
-                Text(observation.notes).font(.subheadline).foregroundStyle(.secondary)
+                Text(observation.notes)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }.padding(.vertical, 5)
     }
