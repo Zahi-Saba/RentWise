@@ -6,6 +6,23 @@ class InspectionNotificationService {
 
     private let notificationCenter = UNUserNotificationCenter.current()
 
+    // Get the reminder time, 30 minutes before inspection
+    static func reminderDate(for inspection: RentalInspection) -> Date {
+        inspection.startTime.addingTimeInterval(-30 * 60)
+    }
+
+    // Use the inspection ID for scheduling and cancellation
+    static func notificationIdentifier(for inspection: RentalInspection) -> String {
+        "inspection-\(inspection.id.uuidString)"
+    }
+
+    static func canScheduleReminder(
+        for inspection: RentalInspection,
+        now: Date = Date()
+    ) -> Bool {
+        reminderDate(for: inspection) > now
+    }
+
     func requestPermission() async throws -> Bool {
         let settings = await notificationCenter.notificationSettings()
 
@@ -31,11 +48,11 @@ class InspectionNotificationService {
         propertyAddress: String
     ) async throws -> Bool {
 
-        let reminderDate = inspection.startTime.addingTimeInterval(-30 * 60)
-
-        guard reminderDate > Date() else {
+        guard Self.canScheduleReminder(for: inspection) else {
             return false
         }
+
+        let reminderDate = Self.reminderDate(for: inspection)
 
         let content = UNMutableNotificationContent()
         content.title = "Upcoming Property Inspection"
@@ -43,7 +60,7 @@ class InspectionNotificationService {
         content.sound = .default
 
         let dateComponents = Calendar.current.dateComponents(
-            [.year, .month, .day, .hour, .minute],
+            [.year, .month, .day, .hour, .minute, .second],
             from: reminderDate
         )
 
@@ -53,7 +70,7 @@ class InspectionNotificationService {
         )
 
         let request = UNNotificationRequest(
-            identifier: "inspection-\(inspection.id.uuidString)",
+            identifier: Self.notificationIdentifier(for: inspection),
             content: content,
             trigger: trigger
         )
@@ -61,10 +78,10 @@ class InspectionNotificationService {
         try await notificationCenter.add(request)
         return true
     }
-    
+
     func cancelReminders(for inspections: [RentalInspection]) {
         let identifiers = inspections.map {
-            "inspection-\($0.id.uuidString)"
+            Self.notificationIdentifier(for: $0)
         }
 
         guard !identifiers.isEmpty else {
@@ -75,5 +92,4 @@ class InspectionNotificationService {
             withIdentifiers: identifiers
         )
     }
-
 }
