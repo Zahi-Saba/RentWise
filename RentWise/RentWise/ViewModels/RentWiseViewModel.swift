@@ -1,3 +1,4 @@
+
 //
 //  RentWiseViewModel.swift
 //  RentWise
@@ -19,7 +20,6 @@ class RentWiseViewModel: ObservableObject {
     private var attemptedListingImports: Set<String> = []
     private var attemptedSharedPayloads: Set<UUID> = []
 
-
     @Published var rentalProperties: [RentalProperty] = []
     @Published var inspections: [RentalInspection] = []
     @Published var observations: [InspectionObservation] = []
@@ -31,11 +31,11 @@ class RentWiseViewModel: ObservableObject {
     private let repository: RentalPropertyRepository
 
     private let saveRentalPropertyUseCase: SaveRentalPropertyUseCase
-    private let deleteRentalPropertyUseCase:DeleteRentalPropertyUseCase
+    private let deleteRentalPropertyUseCase: DeleteRentalPropertyUseCase
     private let scheduleInspectionUseCase: ScheduleInspectionUseCase
-    
+
     private let recordInspectionObservationUseCase: RecordInspectionObservationUseCase
-    
+
     private let updateInspectionObservationUseCase:
         UpdateInspectionObservationUseCase
 
@@ -55,16 +55,16 @@ class RentWiseViewModel: ObservableObject {
             RecordInspectionObservationUseCase(
                 repository: repository
             )
+
         deleteRentalPropertyUseCase =
             DeleteRentalPropertyUseCase(
                 repository: repository
-                    )
-        
+            )
+
         self.updateInspectionObservationUseCase =
-                    UpdateInspectionObservationUseCase(
-                        repository: repository
-                    )
-        
+            UpdateInspectionObservationUseCase(
+                repository: repository
+            )
     }
 
     func clearComparison() {
@@ -74,6 +74,7 @@ class RentWiseViewModel: ObservableObject {
 
     func compareProperties(firstID: UUID, secondID: UUID) {
         clearComparison()
+
         do {
             comparison = try ComparePropertiesUseCase(repository: repository)
                 .execute(firstID: firstID, secondID: secondID)
@@ -87,14 +88,12 @@ class RentWiseViewModel: ObservableObject {
     func loadRentalProperties() {
 
         do {
-
             rentalProperties =
                 try repository.fetchRentalProperties()
 
             errorMessage = ""
 
         } catch {
-
             errorMessage =
                 "Saved rental properties could not be loaded."
         }
@@ -103,16 +102,13 @@ class RentWiseViewModel: ObservableObject {
     func loadUpcomingInspections() {
 
         do {
-
             inspections =
                 try repository.fetchUpcomingInspections()
 
             updateWidget()
-
             errorMessage = ""
 
         } catch {
-
             errorMessage =
                 "Upcoming inspections could not be loaded."
         }
@@ -123,7 +119,6 @@ class RentWiseViewModel: ObservableObject {
     ) {
 
         do {
-
             observations =
                 try repository.fetchObservations(
                     for: inspectionID
@@ -132,7 +127,6 @@ class RentWiseViewModel: ObservableObject {
             errorMessage = ""
 
         } catch {
-
             errorMessage =
                 "Inspection observations could not be loaded."
         }
@@ -143,7 +137,6 @@ class RentWiseViewModel: ObservableObject {
     ) -> String {
 
         for property in rentalProperties {
-
             if property.id == rentalPropertyID {
                 return property.address
             }
@@ -158,7 +151,6 @@ class RentWiseViewModel: ObservableObject {
     ) {
 
         do {
-
             let property =
                 try saveRentalPropertyUseCase.execute(
                     address: address,
@@ -166,64 +158,64 @@ class RentWiseViewModel: ObservableObject {
                 )
 
             rentalProperties.append(property)
-
             errorMessage = ""
 
         } catch SaveRentalPropertyError.missingAddress {
-
             errorMessage =
                 "Please enter the property address."
 
         } catch SaveRentalPropertyError.invalidWeeklyRent {
-
             errorMessage =
                 "Weekly rent must be greater than $0."
 
         } catch {
-
             errorMessage =
                 "The property could not be saved. Please try again."
         }
     }
 
+    // Updated to return the saved inspection for notifications
+    @discardableResult
     func scheduleInspection(
         rentalPropertyID: UUID,
         startTime: Date,
         endTime: Date
-    ) {
+    ) -> RentalInspection? {
 
         do {
-
-            let inspection =
-                try scheduleInspectionUseCase.execute(
-                    rentalPropertyID: rentalPropertyID,
-                    startTime: startTime,
-                    endTime: endTime
-                )
+            let inspection = try scheduleInspectionUseCase.execute(
+                rentalPropertyID: rentalPropertyID,
+                startTime: startTime,
+                endTime: endTime
+            )
 
             inspections.append(inspection)
-
             loadUpcomingInspections()
 
             errorMessage = ""
+            return inspection
 
         } catch ScheduleInspectionError.invalidTime {
-
-            errorMessage =
-                "The inspection end time must be after the start time."
+            errorMessage = "The inspection end time must be after the start time."
 
         } catch {
-
-            errorMessage =
-                "The inspection could not be scheduled. Please try again."
+            errorMessage = "The inspection could not be scheduled. Please try again."
         }
+
+        return nil
     }
+
     func loadPropertyDetails(for propertyID: UUID) {
         propertyInspections = []
         loadLatestInspectionNotes(for: propertyID)
+
         do {
-            propertyInspections = try FetchPropertyInspectionsUseCase(repository: repository).execute(propertyID: propertyID)
-        } catch { errorMessage = "Property inspections could not be loaded." }
+            propertyInspections = try FetchPropertyInspectionsUseCase(
+                repository: repository
+            ).execute(propertyID: propertyID)
+        } catch {
+            errorMessage = "Property inspections could not be loaded."
+        }
     }
 
     func loadLatestInspectionNotes(
@@ -234,7 +226,6 @@ class RentWiseViewModel: ObservableObject {
         latestPropertyObservations = []
 
         do {
-
             let propertyInspections =
                 try repository.fetchInspections(
                     for: rentalPropertyID
@@ -255,13 +246,11 @@ class RentWiseViewModel: ObservableObject {
                     if let currentInspection = selectedInspection {
 
                         if inspection.startTime > currentInspection.startTime {
-
                             selectedInspection = inspection
                             selectedObservations = savedObservations
                         }
 
                     } else {
-
                         selectedInspection = inspection
                         selectedObservations = savedObservations
                     }
@@ -270,20 +259,17 @@ class RentWiseViewModel: ObservableObject {
 
             latestPropertyInspection = selectedInspection
             latestPropertyObservations = selectedObservations
-
             errorMessage = ""
 
         } catch {
-
             errorMessage =
                 "Inspection notes could not be loaded."
         }
     }
-    
+
     func loadInspectionHistory() {
 
         do {
-
             let properties = try repository.fetchRentalProperties()
 
             var pastInspections: [RentalInspection] = []
@@ -298,10 +284,7 @@ class RentWiseViewModel: ObservableObject {
                 for inspection in propertyInspections {
 
                     if inspection.endTime < Date() {
-
-                        pastInspections.append(
-                            inspection
-                        )
+                        pastInspections.append(inspection)
                     }
                 }
             }
@@ -313,18 +296,26 @@ class RentWiseViewModel: ObservableObject {
             errorMessage = ""
 
         } catch {
-
             errorMessage =
                 "Inspection history could not be loaded."
         }
     }
+
     
     func deleteRentalProperty(_ property: RentalProperty) {
 
         do {
+            let propertyInspections = try repository.fetchInspections(
+                for: property.id
+            )
 
             try deleteRentalPropertyUseCase.execute(
                 property: property
+            )
+
+            let notificationService = InspectionNotificationService()
+            notificationService.cancelReminders(
+                for: propertyInspections
             )
 
             loadRentalProperties()
@@ -332,18 +323,15 @@ class RentWiseViewModel: ObservableObject {
 
             errorMessage = ""
 
-        } catch DeleteRentalPropertyError
-            .rentalPropertyNotFound {
-
-            errorMessage =
-                "This rental property could not be found."
+        } catch DeleteRentalPropertyError.rentalPropertyNotFound {
+            errorMessage = "This rental property could not be found."
 
         } catch {
-
-            errorMessage =
-                "The rental property could not be deleted."
+            errorMessage = "The rental property could not be deleted."
         }
     }
+
+
     func recordObservation(
         inspectionID: UUID,
         criterion: InspectionCriterion,
@@ -352,7 +340,6 @@ class RentWiseViewModel: ObservableObject {
     ) {
 
         do {
-
             let observation =
                 try recordInspectionObservationUseCase.execute(
                     inspectionID: inspectionID,
@@ -362,74 +349,58 @@ class RentWiseViewModel: ObservableObject {
                 )
 
             observations.append(observation)
-
             errorMessage = ""
 
         } catch RecordInspectionObservationError.missingNotes {
-
             errorMessage =
                 "Please add a note about what you observed."
 
-        }
-        catch RecordInspectionObservationError.criterionAlreadyRecorded {
-            
+        } catch RecordInspectionObservationError.criterionAlreadyRecorded {
             errorMessage =
-            "This inspection item has already been recorded."
-        }
-        
-        catch {
+                "This inspection item has already been recorded."
 
+        } catch {
             errorMessage =
                 "The observation could not be saved. Please try again."
         }
     }
+
     func updateObservation(
-            observation: InspectionObservation,
-            status: ObservationStatus,
-            notes: String
-        ) {
+        observation: InspectionObservation,
+        status: ObservationStatus,
+        notes: String
+    ) {
 
-            do {
+        do {
+            let updatedObservation =
+                try updateInspectionObservationUseCase.execute(
+                    observation: observation,
+                    status: status,
+                    notes: notes
+                )
 
-                let updatedObservation =
-                    try updateInspectionObservationUseCase
-                        .execute(
-                            observation: observation,
-                            status: status,
-                            notes: notes
-                        )
+            for index in observations.indices {
 
-                for index in observations.indices {
-
-                    if observations[index].id ==
-                        updatedObservation.id {
-
-                        observations[index] =
-                            updatedObservation
-                    }
+                if observations[index].id == updatedObservation.id {
+                    observations[index] = updatedObservation
                 }
-
-                errorMessage = ""
-
-            } catch UpdateInspectionObservationError
-                .missingNotes {
-
-                errorMessage =
-                    "Please add a note about what you observed."
-
-            } catch UpdateInspectionObservationError
-                .observationNotFound {
-
-                errorMessage =
-                    "This inspection observation could not be found."
-
-            } catch {
-
-                errorMessage =
-                    "The observation could not be updated. Please try again."
             }
-        }
 
+            errorMessage = ""
+
+        } catch UpdateInspectionObservationError.missingNotes {
+            errorMessage =
+                "Please add a note about what you observed."
+
+        } catch UpdateInspectionObservationError.observationNotFound {
+            errorMessage =
+                "This inspection observation could not be found."
+
+        } catch {
+            errorMessage =
+                "The observation could not be updated. Please try again."
+        }
+    }
 
     private func updateWidget() {
 
@@ -445,9 +416,7 @@ class RentWiseViewModel: ObservableObject {
                 endTime: inspection.endTime
             )
 
-            sharedInspections.append(
-                sharedInspection
-            )
+            sharedInspections.append(sharedInspection)
         }
 
         SharedWidgetData.saveInspections(
@@ -461,34 +430,58 @@ class RentWiseViewModel: ObservableObject {
 
     func importSharedListings() async {
         guard !isImportingListings else { return }
+
         isImportingListings = true
         importMessage = ""
         defer { isImportingListings = false }
+
         let useCase = ImportSharedPropertyUseCase(repository: repository)
+
         do {
             for (file, listing) in try SharedRentalLinkData.pendingListings() {
-                guard attemptedSharedPayloads.insert(listing.id).inserted else { continue }
+
+                guard attemptedSharedPayloads.insert(listing.id).inserted else {
+                    continue
+                }
+
                 do {
                     // Safari already supplied the title and price: save immediately.
-                    _ = try useCase.execute(link: listing.url, title: listing.title, weeklyRent: listing.weeklyRent)
+                    _ = try useCase.execute(
+                        link: listing.url,
+                        title: listing.title,
+                        weeklyRent: listing.weeklyRent
+                    )
+
                     try SharedRentalLinkData.acknowledgeListing(file)
                     loadRentalProperties()
+
                 } catch {
                     importMessage = "A shared listing could not be saved. Pull down to retry."
                 }
             }
+
         } catch {
             importMessage = "Shared listings could not be read. Check App Group signing or pull down to retry."
         }
+
         // Import any URL-only shares queued by the previous extension version.
-        for link in SharedRentalLinkData.loadLinks() where !attemptedListingImports.contains(link) {
+        for link in SharedRentalLinkData.loadLinks()
+        where !attemptedListingImports.contains(link) {
+
             attemptedListingImports.insert(link)
+
             do {
                 let url = try ImportSharedPropertyUseCase.validatedURL(link)
                 let metadata = await listingPreviewService.metadata(for: url)
-                _ = try useCase.execute(link: link, title: metadata?.title)
+
+                _ = try useCase.execute(
+                    link: link,
+                    title: metadata?.title
+                )
+
                 SharedRentalLinkData.removeLink(link)
                 loadRentalProperties()
+
             } catch {
                 importMessage = "A shared listing could not be saved. Pull down to retry."
             }
@@ -503,6 +496,7 @@ class RentWiseViewModel: ObservableObject {
 
     func retrySharedImports() async {
         guard !isImportingListings else { return }
+
         attemptedListingImports.removeAll()
         attemptedSharedPayloads.removeAll()
         await refreshShortlist()
@@ -510,12 +504,21 @@ class RentWiseViewModel: ObservableObject {
 
     func importListingURL(_ text: String) async -> Bool {
         importMessage = ""
+
         do {
             let url = try ImportSharedPropertyUseCase.validatedURL(text)
             let metadata = await listingPreviewService.metadata(for: url)
-            _ = try ImportSharedPropertyUseCase(repository: repository).execute(link: text, title: metadata?.title)
+
+            _ = try ImportSharedPropertyUseCase(
+                repository: repository
+            ).execute(
+                link: text,
+                title: metadata?.title
+            )
+
             loadRentalProperties()
             return true
+
         } catch {
             importMessage = error.localizedDescription
             return false
