@@ -10,6 +10,9 @@ import SwiftUI
 struct InspectionReportsView: View {
     @ObservedObject var viewModel: InspectionReportsViewModel
     
+    @ScaledMetric(relativeTo: .body)
+    private var minimumButtonHeight: CGFloat = 44
+    
     // Controls whether an error alert should be displayed
     private var showingError: Binding<Bool> {
         Binding(
@@ -29,6 +32,7 @@ struct InspectionReportsView: View {
                     Label("Property Condition Reports", systemImage: "doc.text")
                         .font(.title2.bold())
                         .foregroundStyle(Color.accentColor)
+                        .fixedSize(horizontal: false, vertical: true)
                     
                     Text(
                         "Select a saved inspection to generate " +
@@ -37,6 +41,7 @@ struct InspectionReportsView: View {
                     )
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.vertical, 8)
             }
@@ -51,6 +56,8 @@ struct InspectionReportsView: View {
                                             "inspection to get started."
                                            )
                     )
+                    .fixedSize(horizontal: false, vertical: true)
+                    
                 } else {
                     ForEach(viewModel.reportOptions) { option in
                         InspectionReportRow(option: option, isSelected: viewModel.selectedInspectionID == option.id
@@ -63,27 +70,26 @@ struct InspectionReportsView: View {
             
             // Generate report
             Section {
+                // Generate PDF button
                 Button {
                     viewModel.generateReport()
                 } label: {
-                    HStack(spacing: 10) {
-                        
-                        Spacer()
-                        
+                    HStack(spacing: 12) {
                         if viewModel.isGenerating {
                             ProgressView()
+                                .accessibilityHidden(true)
                         } else {
                             Image(systemName: "doc.badge.plus")
+                                .accessibilityHidden(true)
                         }
-                        
-                        Text(
-                            viewModel.isGenerating ? "Generating Report...": "Generate PDF Report"
-                        )
-                        .font(.headline)
-                        
-                        Spacer()
+
+                        Text(viewModel.isGenerating ? "Generating Report...": "Generate PDF Report")
+                            .font(.headline)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    .frame(minHeight: 44)
+                    .frame(maxWidth: .infinity)
+                    .frame(minHeight: minimumButtonHeight)
+                    .padding(.vertical, 6)
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(Color.accentColor)

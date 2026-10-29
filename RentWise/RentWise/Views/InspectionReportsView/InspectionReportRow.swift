@@ -11,45 +11,39 @@ struct InspectionReportRow: View {
     let option: InspectionReportOption
     let isSelected: Bool
     let onSelect: () -> Void
+    
+    @Environment(\.dynamicTypeSize)
+    private var dynamicTypeSize
 
     var body: some View {
         Button(action: onSelect) {
-            HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(option.property.address)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
+            Group {
+                if dynamicTypeSize.isAccessibilitySize {
+                    VStack(alignment: .leading, spacing: 12) {
 
-                    Text(
-                        option.inspection.startTime.formatted(date: .abbreviated, time: .shortened)
-                    )
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                        propertyDetails
 
-                    if option.canGenerateReport {
                         Label(
-                            "\(option.observationCount) recorded observations",
-                            systemImage: "checkmark.circle"
+                            isSelected ? "Selected" : "Not selected",
+                            systemImage: isSelected ? "checkmark.circle.fill": "circle"
                         )
-                        .font(.caption)
-                        .foregroundStyle(.green)
+                        .font(.subheadline)
+                        .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
+                    }
+                } else {
+                    HStack(spacing: 12) {
 
-                    } else {
-                        Label("No recorded observations", systemImage: "exclamationmark.circle"
-                        )
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        propertyDetails
+
+                        Spacer(minLength: 8)
+
+                        Image(systemName: isSelected ? "checkmark.circle.fill": "circle")
+                            .font(.title2)
+                            .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
                     }
                 }
-
-                Spacer(minLength: 8)
-
-                Image(
-                    systemName: isSelected ? "checkmark.circle.fill": "circle"
-                )
-                .font(.title2)
-                .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 8)
             .contentShape(Rectangle())
         }
@@ -66,6 +60,38 @@ struct InspectionReportRow: View {
             isSelected ? "Selected" : "Not selected"
         )
         .accessibilityHint("Double tap to select this inspection")
+    }
+    
+    private var propertyDetails: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Property address
+            Text(option.property.address)
+                .font(.headline)
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            // Inspection date and time
+            Text(option.inspection.startTime.formatted(date: .abbreviated, time: .shortened))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            // Observation availability
+            if option.canGenerateReport {
+                Label(
+                    "\(option.observationCount) recorded observations",
+                    systemImage: "checkmark.circle"
+                )
+                .font(.caption)
+                .foregroundStyle(.green)
+                .fixedSize(horizontal: false, vertical: true)
+            } else {
+                Label("No recorded observations", systemImage: "exclamationmark.circle")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 }
 
