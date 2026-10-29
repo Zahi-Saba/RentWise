@@ -18,7 +18,7 @@ struct EditObservationView: View {
         Form {
             Section {
                 Label(observation.criterion.displayName, systemImage: "pencil.circle")
-                    .font(.title3.bold()).foregroundStyle(.teal)
+                    .font(.title3.bold()).foregroundStyle(Color.accentColor)
             }
             Section("Result") {
                 Picker("Status", selection: $status) {
@@ -40,7 +40,7 @@ struct EditObservationView: View {
                 } label: { Label("Save Changes", systemImage: "checkmark.circle").font(.headline).padding(.vertical, 6) }
             }
         }
-        .tint(.teal)
+        .tint(Color.accentColor)
         .navigationTitle("Edit Observation")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { viewModel.errorMessage = "" }

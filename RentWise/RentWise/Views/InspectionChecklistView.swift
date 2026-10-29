@@ -52,7 +52,7 @@ struct InspectionChecklistView: View {
                 }
             }
         }
-        .tint(.teal)
+        .tint(Color.accentColor)
         .navigationTitle("Inspection Observations")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {

@@ -3,6 +3,7 @@ import SwiftUI
 struct RentWiseRootView: View {
     @ObservedObject var viewModel: RentWiseViewModel
     @ObservedObject var reportsViewModel: InspectionReportsViewModel
+    @AppStorage("appAppearance") private var appearance = "System"
     @Environment(\.scenePhase) private var scenePhase
     var body: some View {
         TabView {
@@ -14,6 +15,7 @@ struct RentWiseRootView: View {
                 .tabItem { Label("Compare", systemImage: "rectangle.split.2x1") }
             NavigationStack { InspectionReportsView(viewModel: reportsViewModel)}
                 .tabItem { Label("Reports", systemImage: "doc.text")}}
+        .preferredColorScheme(appearance == "Dark" ? .dark : appearance == "Light" ? .light : nil)
         .tint(Color.accentColor)
         .task { await viewModel.refreshShortlist() }
         .onChange(of: scenePhase) { _, phase in

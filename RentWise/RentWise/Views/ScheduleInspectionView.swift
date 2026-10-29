@@ -12,7 +12,7 @@ struct ScheduleInspectionView: View {
         Form {
             Section {
                 Label("Your inspection", systemImage: "calendar.badge.plus")
-                    .font(.headline).foregroundStyle(.teal)
+                    .font(.headline).foregroundStyle(Color.accentColor)
                 Text(property.address).font(.headline)
                 Text(property.rentLabel).foregroundStyle(.secondary)
             }
@@ -35,7 +35,7 @@ struct ScheduleInspectionView: View {
                 }
             }
         }
-        .tint(.teal)
+        .tint(Color.accentColor)
         .navigationTitle("Schedule Inspection")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { viewModel.errorMessage = "" }

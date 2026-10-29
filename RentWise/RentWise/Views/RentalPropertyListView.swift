@@ -2,6 +2,8 @@ import SwiftUI
 
 struct RentalPropertyListView: View {
     @ObservedObject var viewModel: RentWiseViewModel
+    @AppStorage("appAppearance") private var appearance = "System"
+    @Environment(\.colorScheme) private var colorScheme
     @State private var showImport = false
     var body: some View {
         List {
@@ -42,7 +44,7 @@ struct RentalPropertyListView: View {
                             if let source = property.sourceURL, let url = URL(string: source) {
                                 ListingLinkPreview(url: url, service: viewModel.listingPreviewService)
                             }
-                            Label("Saved listing", systemImage: "house.fill").font(.caption).foregroundStyle(.teal)
+                            Label("Saved listing", systemImage: "house.fill").font(.caption).foregroundStyle(Color.accentColor)
                             Text(property.address).font(.headline)
                             Text(property.rentLabel).font(.subheadline)
                         }.padding(.vertical, 8)
@@ -51,6 +53,24 @@ struct RentalPropertyListView: View {
                 }
             }
             if !viewModel.errorMessage.isEmpty { Text(viewModel.errorMessage).foregroundStyle(.red) }
+            Section {
+                HStack {
+                    Spacer()
+                    Button {
+                        appearance = colorScheme == .dark ? "Light" : "Dark"
+                    } label: {
+                        Image(systemName: colorScheme == .dark ? "sun.max.fill" : "moon.fill")
+                            .font(.title2)
+                            .frame(width: 48, height: 48)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.teal)
+                    .accessibilityLabel(colorScheme == .dark ? "Switch to light mode" : "Switch to dark mode")
+                    Spacer()
+                }
+            }
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
         }
         .navigationTitle("Rentwise")
         .sheet(isPresented: $showImport) { ImportListingView(viewModel: viewModel) }
