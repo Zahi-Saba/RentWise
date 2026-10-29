@@ -61,4 +61,19 @@ class InspectionNotificationService {
         try await notificationCenter.add(request)
         return true
     }
+    
+    func cancelReminders(for inspections: [RentalInspection]) {
+        let identifiers = inspections.map {
+            "inspection-\($0.id.uuidString)"
+        }
+
+        guard !identifiers.isEmpty else {
+            return
+        }
+
+        notificationCenter.removePendingNotificationRequests(
+            withIdentifiers: identifiers
+        )
+    }
+
 }

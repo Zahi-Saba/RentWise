@@ -301,26 +301,36 @@ class RentWiseViewModel: ObservableObject {
         }
     }
 
+    
     func deleteRentalProperty(_ property: RentalProperty) {
 
         do {
+            let propertyInspections = try repository.fetchInspections(
+                for: property.id
+            )
+
             try deleteRentalPropertyUseCase.execute(
                 property: property
             )
 
+            let notificationService = InspectionNotificationService()
+            notificationService.cancelReminders(
+                for: propertyInspections
+            )
+
             loadRentalProperties()
             loadUpcomingInspections()
+
             errorMessage = ""
 
         } catch DeleteRentalPropertyError.rentalPropertyNotFound {
-            errorMessage =
-                "This rental property could not be found."
+            errorMessage = "This rental property could not be found."
 
         } catch {
-            errorMessage =
-                "The rental property could not be deleted."
+            errorMessage = "The rental property could not be deleted."
         }
     }
+
 
     func recordObservation(
         inspectionID: UUID,
