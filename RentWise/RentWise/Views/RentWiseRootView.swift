@@ -14,7 +14,7 @@ struct RentWiseRootView: View {
                 .tabItem { Label("Compare", systemImage: "rectangle.split.2x1") }
             NavigationStack { InspectionReportsView(viewModel: reportsViewModel)}
                 .tabItem { Label("Reports", systemImage: "doc.text")}}
-        .tint(.teal)
+        .tint(Color.accentColor)
         .task { await viewModel.refreshShortlist() }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { Task { await viewModel.refreshShortlist() } }
