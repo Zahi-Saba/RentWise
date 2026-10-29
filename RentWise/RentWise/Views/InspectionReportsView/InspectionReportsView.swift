@@ -28,7 +28,7 @@ struct InspectionReportsView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Label("Property Condition Reports", systemImage: "doc.text")
                         .font(.title2.bold())
-                        .foregroundStyle(.teal)
+                        .foregroundStyle(Color.accentColor)
                     
                     Text(
                         "Select a saved inspection to generate " +
@@ -86,7 +86,7 @@ struct InspectionReportsView: View {
                     .frame(minHeight: 44)
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(.teal)
+                .tint(Color.accentColor)
                 .disabled(!viewModel.canGenerateReport)
                 
                 if let selectedOption = viewModel.selectedOption, !selectedOption.canGenerateReport {

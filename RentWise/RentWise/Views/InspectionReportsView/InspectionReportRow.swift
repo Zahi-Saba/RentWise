@@ -48,7 +48,7 @@ struct InspectionReportRow: View {
                     systemName: isSelected ? "checkmark.circle.fill": "circle"
                 )
                 .font(.title2)
-                .foregroundStyle(isSelected ? Color.teal : Color.secondary)
+                .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
             }
             .padding(.vertical, 8)
             .contentShape(Rectangle())
