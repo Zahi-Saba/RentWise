@@ -50,7 +50,7 @@ struct PropertyComparisonView: View {
             }.padding()
         }
         .background(Color(uiColor: .systemGroupedBackground))
-        .tint(.teal)
+        .tint(Color.accentColor)
         .navigationTitle("Compare")
         .onAppear(perform: refresh)
         .onChange(of: scenePhase) { _, phase in if phase == .active { refresh() } }
@@ -88,7 +88,7 @@ struct PropertyComparisonView: View {
 
     private func header(_ item: ComparedProperty, label: String, width: CGFloat) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(label).font(.caption.bold()).foregroundStyle(.teal)
+            Text(label).font(.caption.bold()).foregroundStyle(Color.accentColor)
             Text(item.property.address).font(.headline)
             Text(item.property.rentLabel).font(.title3.bold())
             if let inspection = item.inspection {

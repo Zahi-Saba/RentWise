@@ -44,7 +44,7 @@ struct RentalPropertyListView: View {
                             if let source = property.sourceURL, let url = URL(string: source) {
                                 ListingLinkPreview(url: url, service: viewModel.listingPreviewService)
                             }
-                            Label("Saved listing", systemImage: "house.fill").font(.caption).foregroundStyle(.teal)
+                            Label("Saved listing", systemImage: "house.fill").font(.caption).foregroundStyle(Color.accentColor)
                             Text(property.address).font(.headline)
                             Text(property.rentLabel).font(.subheadline)
                         }.padding(.vertical, 8)

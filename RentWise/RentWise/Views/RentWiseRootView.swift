@@ -16,7 +16,7 @@ struct RentWiseRootView: View {
             NavigationStack { InspectionReportsView(viewModel: reportsViewModel)}
                 .tabItem { Label("Reports", systemImage: "doc.text")}}
         .preferredColorScheme(appearance == "Dark" ? .dark : appearance == "Light" ? .light : nil)
-        .tint(.teal)
+        .tint(Color.accentColor)
         .task { await viewModel.refreshShortlist() }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { Task { await viewModel.refreshShortlist() } }

@@ -32,7 +32,7 @@ struct RentalPropertyDetailView: View {
                     rentHeading
                 }
                 Label("Saved property", systemImage: "bookmark.fill")
-                    .font(.caption.weight(.semibold)).foregroundStyle(.teal)
+                    .font(.caption.weight(.semibold)).foregroundStyle(Color.accentColor)
                 Text(currentProperty.address).font(.title3.bold()).textSelection(.enabled)
                 if currentProperty.weeklyRent <= 0, currentProperty.sourceURL != nil {
                     Text("To update the rent, open the listing in Safari and share it to Rentwise again after the weekly price loads.")
@@ -45,7 +45,7 @@ struct RentalPropertyDetailView: View {
                     ScheduleInspectionView(viewModel: viewModel, property: currentProperty)
                 } label: {
                     Label("Schedule Inspection", systemImage: "calendar.badge.plus")
-                        .font(.headline).foregroundStyle(.teal).padding(.vertical, 6)
+                        .font(.headline).foregroundStyle(Color.accentColor).padding(.vertical, 6)
                 }
                 if inspections.isEmpty {
                     Label("No inspections scheduled", systemImage: "calendar")
@@ -83,7 +83,7 @@ struct RentalPropertyDetailView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .tint(.teal)
+        .tint(Color.accentColor)
         .navigationTitle("Property")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { viewModel.loadPropertyDetails(for: property.id) }
@@ -94,7 +94,7 @@ struct RentalPropertyDetailView: View {
             Text(currentProperty.rentLabel).font(.title.bold()).foregroundStyle(.primary)
             Spacer(minLength: 8)
             if currentProperty.sourceURL != nil {
-                Image(systemName: "arrow.up.right").foregroundStyle(.teal).accessibilityHidden(true)
+                Image(systemName: "arrow.up.right").foregroundStyle(Color.accentColor).accessibilityHidden(true)
             }
         }
     }
