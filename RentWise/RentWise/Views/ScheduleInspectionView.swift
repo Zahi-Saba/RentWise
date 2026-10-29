@@ -7,6 +7,7 @@ struct ScheduleInspectionView: View {
     let property: RentalProperty
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     @State private var startTime = Date()
     @State private var endTime = Date().addingTimeInterval(30 * 60)
@@ -23,18 +24,22 @@ struct ScheduleInspectionView: View {
 
                 Text(property.address)
                     .font(.headline)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Text(property.rentLabel)
                     .foregroundStyle(.secondary)
             }
 
             Section {
-                DatePicker("Starts", selection: $startTime)
-                DatePicker("Ends", selection: $endTime)
+                inspectionDatePicker("Starts", selection: $startTime)
+                inspectionDatePicker("Ends", selection: $endTime)
             } header: {
                 Text("Date & time")
             } footer: {
-                Text("Choose the start and end of your visit. The end must be after the start.")
+                Text(
+                    "Choose the start and end of your visit. " +
+                    "The end must be after the start."
+                )
             }
 
             if !viewModel.errorMessage.isEmpty {
@@ -50,12 +55,15 @@ struct ScheduleInspectionView: View {
                 } label: {
                     if isScheduling {
                         ProgressView("Setting reminder...")
+                            .frame(minHeight: 44)
                     } else {
                         Label(
                             "Schedule Inspection",
                             systemImage: "calendar.badge.plus"
                         )
                         .font(.headline)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(minHeight: 44)
                         .padding(.vertical, 6)
                     }
                 }
@@ -89,7 +97,7 @@ struct ScheduleInspectionView: View {
 
         isScheduling = true
 
-        Task { @MainActor in
+        Task { @MainActor in {
             var message = "Your inspection has been saved."
 
             let reminderDate = inspection.startTime.addingTimeInterval(-30 * 60)
@@ -99,7 +107,6 @@ struct ScheduleInspectionView: View {
             } else {
                 do {
                     let service = InspectionNotificationService()
-
                     let allowed = try await service.requestPermission()
 
                     if allowed {
@@ -113,7 +120,6 @@ struct ScheduleInspectionView: View {
                         } else {
                             message += " The reminder time has already passed, so no notification was scheduled."
                         }
-
                     } else {
                         message += " Notifications are disabled, so no reminder was set."
                     }
@@ -127,6 +133,39 @@ struct ScheduleInspectionView: View {
             reminderMessage = message
             isScheduling = false
             showConfirmation = true
+        }}
+    }
+
+    @ViewBuilder
+    private func inspectionDatePicker(
+        _ title: String,
+        selection: Binding<Date>
+    ) -> some View {
+
+        if dynamicTypeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(title)
+                    .font(.headline)
+
+                DatePicker(
+                    "\(title) date",
+                    selection: selection,
+                    displayedComponents: .date
+                )
+                .labelsHidden()
+
+                DatePicker(
+                    "\(title) time",
+                    selection: selection,
+                    displayedComponents: .hourAndMinute
+                )
+                .labelsHidden()
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 8)
+
+        } else {
+            DatePicker(title, selection: selection)
         }
     }
 }

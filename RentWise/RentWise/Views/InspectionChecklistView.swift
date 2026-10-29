@@ -7,6 +7,9 @@ struct InspectionChecklistView: View {
     @State private var status: ObservationStatus = .notChecked
     @State private var notes = ""
     @State private var saved = false
+    
+    @Environment(\.dynamicTypeSize)
+    private var dynamicTypeSize
 
     private var observations: [InspectionObservation] {
         viewModel.observations.filter { $0.inspectionID == inspection.id }
@@ -20,16 +23,19 @@ struct InspectionChecklistView: View {
                 Text(inspection.startTime.formatted(date: .abbreviated, time: .shortened))
                     .foregroundStyle(.secondary)
             }
+            
             Section("New observation") {
-                Picker("Inspection item", selection: $criterion) {
-                    ForEach(InspectionCriterion.allCases, id: \.self) { Text($0.displayName).tag($0) }
-                }
-                Picker("Result", selection: $status) {
-                    ForEach(ObservationStatus.allCases, id: \.self) { Text($0.displayName).tag($0) }
-                }
+                // Adaptive inspection criterion picker
+                inspectionItemPicker
+
+                // Adaptive result/status picker
+                observationResultPicker
+
                 TextField("What did you notice?", text: $notes, axis: .vertical)
-                    .lineLimit(3...8).accessibilityLabel("Observation notes")
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 5...12 : 3...8)
+                    .accessibilityLabel("Observation notes")
             }
+
             Section {
                 Button {
                     viewModel.recordObservation(inspectionID: inspection.id, criterion: criterion,
@@ -60,5 +66,46 @@ struct InspectionChecklistView: View {
             viewModel.loadObservations(for: inspection.id)
         }
         .alert("Observation Saved", isPresented: $saved) { Button("Done", role: .cancel) {} }
+    }
+    
+    //Shows the inspection criteria as an inline list  when accessibility text sizes are enabled
+    @ViewBuilder
+    private var inspectionItemPicker: some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            Picker("Inspection item", selection: $criterion) {
+                ForEach(InspectionCriterion.allCases, id: \.self) {
+                    Text($0.displayName).tag($0)
+                }
+            }
+            .pickerStyle(.inline)
+
+        } else {
+            // Preserve the existing compact picker layout
+            Picker("Inspection item", selection: $criterion) {
+                ForEach(InspectionCriterion.allCases, id: \.self) {
+                    Text($0.displayName).tag($0)
+                }
+            }
+        }
+    }
+
+    /// Displays results in an expanded list for users  with larger accessibility text settings
+    @ViewBuilder
+    private var observationResultPicker: some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            Picker("Result", selection: $status) {
+                ForEach(ObservationStatus.allCases, id: \.self) {
+                    Text($0.displayName).tag($0)
+                }
+            }
+            .pickerStyle(.inline)
+
+        } else {
+            Picker("Result", selection: $status) {
+                ForEach(ObservationStatus.allCases, id: \.self) {
+                    Text($0.displayName).tag($0)
+                }
+            }
+        }
     }
 }

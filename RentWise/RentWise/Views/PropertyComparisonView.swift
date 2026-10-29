@@ -41,13 +41,21 @@ struct PropertyComparisonView: View {
                     Text(rentSummary(result)).font(.headline)
                     Text("Observations come from each property's latest inspection with saved notes. Dates may differ; unrecorded items are shown as Not Checked.")
                         .font(.footnote).foregroundStyle(.secondary)
-                    // Keep rows aligned while allowing large text to grow vertically.
-                    ScrollView(.horizontal) {
-                        comparisonTable(result, width: typeSize.isAccessibilitySize ? 280 : 170)
+                    
+                    // Keep rows aligned while allowing large text to grow vertically
+                    if typeSize.isAccessibilitySize {
+                        accessibleComparison(result)
+                    } else {
+                        ScrollView(.horizontal) {
+                            comparisonTable(result, width: 170)
+                        }
+                        .accessibilityHint(
+                            "Scroll horizontally to compare both properties."
+                        )
                     }
-                    .accessibilityHint("Scroll horizontally to view both properties")
                 }
-            }.padding()
+            }
+            .padding()
         }
         .background(Color(uiColor: .systemGroupedBackground))
         .tint(Color.accentColor)
@@ -86,11 +94,59 @@ struct PropertyComparisonView: View {
         }.padding().background(.background, in: RoundedRectangle(cornerRadius: 20))
     }
 
-    private func header(_ item: ComparedProperty, label: String, width: CGFloat) -> some View {
+    
+    // MARK: - Accessibility Comparison Layout
+
+    /// Displays each property vertically when the user
+    /// enables larger accessibility text sizes.
+    private func accessibleComparison(
+        _ result: PropertyComparison
+    ) -> some View {
+
+        VStack(alignment: .leading, spacing: 20) {
+
+            accessiblePropertyCard(
+                result.first,
+                label: "Property A"
+            )
+
+            accessiblePropertyCard(
+                result.second,
+                label: "Property B"
+            )
+        }
+    }
+
+    private func accessiblePropertyCard(_ item: ComparedProperty, label: String) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Property information and weekly rent
+            header(item, label: label, width: nil)
+
+            Divider()
+
+            // Display all comparison criteria vertically
+            ForEach(InspectionCriterion.allCases, id: \.self) { criterion in
+                observationCell(item, criterion: criterion, width: nil)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(.background, in: RoundedRectangle(cornerRadius: 20)
+        )
+    }
+    
+    private func header(_ item: ComparedProperty, label: String, width: CGFloat?) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(label).font(.caption.bold()).foregroundStyle(Color.accentColor)
-            Text(item.property.address).font(.headline)
-            Text(item.property.rentLabel).font(.title3.bold())
+            
+            Text(item.property.address)
+                .font(.headline)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            Text(item.property.rentLabel)
+                .font(.title3.bold())
+                .fixedSize(horizontal: false, vertical: true)
+            
             if let inspection = item.inspection {
                 Text("Inspection: \(inspection.startTime.formatted(date: .abbreviated, time: .shortened))")
                     .font(.caption).foregroundStyle(.secondary)
@@ -104,7 +160,7 @@ struct PropertyComparisonView: View {
         }.frame(width: width, alignment: .leading)
     }
 
-    private func observationCell(_ item: ComparedProperty, criterion: InspectionCriterion, width: CGFloat) -> some View {
+    private func observationCell(_ item: ComparedProperty, criterion: InspectionCriterion, width: CGFloat?) -> some View {
         let observation = item.observation(for: criterion)
         let status = observation?.status ?? .notChecked
         return VStack(alignment: .leading, spacing: 8) {
@@ -112,8 +168,12 @@ struct PropertyComparisonView: View {
             Text(criterion.displayName).font(.headline)
             Label(status.displayName, systemImage: status.symbol)
                 .foregroundStyle(status.color).font(.subheadline)
+            
             if let observation, !observation.notes.isEmpty {
-                Text(observation.notes).font(.subheadline).foregroundStyle(.secondary)
+                Text(observation.notes)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .frame(width: width, alignment: .leading)

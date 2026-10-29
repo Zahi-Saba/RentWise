@@ -5,6 +5,9 @@ struct ListingLinkPreview: View {
     let url: URL
     let service: ListingPreviewService
     @State private var metadata: LPLinkMetadata?
+    @ScaledMetric(relativeTo: .body)
+    private var previewHeight: CGFloat = 190
+    
     var body: some View {
         Group {
             if let metadata {
@@ -16,7 +19,7 @@ struct ListingLinkPreview: View {
                 }
             }
         }
-        .frame(height: 190)
+        .frame(height: previewHeight)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .allowsHitTesting(false)
         .accessibilityHidden(true)

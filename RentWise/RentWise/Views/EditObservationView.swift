@@ -6,6 +6,8 @@ struct EditObservationView: View {
     @State private var status: ObservationStatus
     @State private var notes: String
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize)
+    private var dynamicTypeSize
 
     init(viewModel: RentWiseViewModel, observation: InspectionObservation) {
         self.viewModel = viewModel
@@ -20,29 +22,51 @@ struct EditObservationView: View {
                 Label(observation.criterion.displayName, systemImage: "pencil.circle")
                     .font(.title3.bold()).foregroundStyle(Color.accentColor)
             }
+            
             Section("Result") {
-                Picker("Status", selection: $status) {
-                    ForEach(ObservationStatus.allCases, id: \.self) { Text($0.displayName).tag($0) }
-                }
+                observationStatusPicker
             }
+            
             Section("Your notes") {
                 TextField("What did you notice?", text: $notes, axis: .vertical)
-                    .lineLimit(4...10).accessibilityLabel("Observation notes")
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 6...14 : 4...10)
+                    .accessibilityLabel("Observation notes")
+                
+                if !viewModel.errorMessage.isEmpty {
+                    Section { Text(viewModel.errorMessage).foregroundStyle(.red) }
+                }
+                Section {
+                    Button {
+                        viewModel.updateObservation(observation: observation, status: status,
+                                                    notes: notes.trimmingCharacters(in: .whitespacesAndNewlines))
+                        if viewModel.errorMessage.isEmpty { dismiss() }
+                    } label: { Label("Save Changes", systemImage: "checkmark.circle").font(.headline).padding(.vertical, 6) }
+                }
             }
-            if !viewModel.errorMessage.isEmpty {
-                Section { Text(viewModel.errorMessage).foregroundStyle(.red) }
+            .tint(Color.accentColor)
+            .navigationTitle("Edit Observation")
+            .navigationBarTitleDisplayMode(.inline)
+            .onAppear { viewModel.errorMessage = "" }
+        }
+    }
+    
+    // Uses a vertical list at accessibility text sizes to avoid truncating long status labels.
+    @ViewBuilder
+    private var observationStatusPicker: some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            Picker("Status", selection: $status) {
+                ForEach(ObservationStatus.allCases, id: \.self) {
+                    Text($0.displayName).tag($0)
+                }
             }
-            Section {
-                Button {
-                    viewModel.updateObservation(observation: observation, status: status,
-                                                notes: notes.trimmingCharacters(in: .whitespacesAndNewlines))
-                    if viewModel.errorMessage.isEmpty { dismiss() }
-                } label: { Label("Save Changes", systemImage: "checkmark.circle").font(.headline).padding(.vertical, 6) }
+            .pickerStyle(.inline)
+
+        } else {
+            Picker("Status", selection: $status) {
+                ForEach(ObservationStatus.allCases, id: \.self) {
+                    Text($0.displayName).tag($0)
+                }
             }
         }
-        .tint(Color.accentColor)
-        .navigationTitle("Edit Observation")
-        .navigationBarTitleDisplayMode(.inline)
-        .onAppear { viewModel.errorMessage = "" }
     }
 }

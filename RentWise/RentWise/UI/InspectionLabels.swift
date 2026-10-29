@@ -33,12 +33,30 @@ extension ObservationStatus {
 
 struct InspectionObservationSummary: View {
     let observation: InspectionObservation
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(observation.criterion.displayName).font(.headline)
-            Label(observation.status.displayName, systemImage: observation.status.symbol)
-                .font(.subheadline).foregroundStyle(observation.status.color)
-            Text(observation.notes).font(.subheadline).foregroundStyle(.secondary)
-        }.padding(.vertical, 5)
+            // Criterion name
+            Text(observation.criterion.displayName)
+                .font(.headline)
+                .fixedSize(horizontal: false, vertical: true)
+
+            // Status with both an icon and text
+            Label(
+                observation.status.displayName,
+                systemImage: observation.status.symbol
+            )
+            .font(.subheadline)
+            .foregroundStyle(observation.status.color)
+            .fixedSize(horizontal: false, vertical: true)
+
+            if !observation.notes.isEmpty {
+                Text(observation.notes)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(.vertical, 5)
     }
 }
