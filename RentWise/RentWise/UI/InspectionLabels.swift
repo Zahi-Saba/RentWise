@@ -42,13 +42,7 @@ struct InspectionObservationSummary: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             // Status with both an icon and text
-            Label(
-                observation.status.displayName,
-                systemImage: observation.status.symbol
-            )
-            .font(.subheadline)
-            .foregroundStyle(observation.status.color)
-            .fixedSize(horizontal: false, vertical: true)
+            InspectionStatusLabel(status: observation.status)
 
             if !observation.notes.isEmpty {
                 Text(observation.notes)

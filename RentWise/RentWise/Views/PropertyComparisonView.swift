@@ -199,8 +199,8 @@ struct PropertyComparisonView: View {
         return VStack(alignment: .leading, spacing: 8) {
             Divider()
             Text(criterion.displayName).font(.headline)
-            Label(status.displayName, systemImage: status.symbol)
-                .foregroundStyle(status.color).font(.subheadline)
+            
+            InspectionStatusLabel(status: status)
             
             if let observation, !observation.notes.isEmpty {
                 Text(observation.notes)

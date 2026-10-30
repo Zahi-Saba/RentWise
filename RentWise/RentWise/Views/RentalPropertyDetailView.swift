@@ -149,8 +149,7 @@ struct RentalPropertyDetailView: View {
         let status = observation?.status ?? .notChecked
         return VStack(alignment: .leading, spacing: 7) {
             Text(criterion == .roomSpace ? "Room Space" : criterion.rawValue.capitalized).font(.headline)
-            Label(statusLabel(status), systemImage: statusIcon(status))
-                .font(.subheadline).foregroundStyle(statusColor(status))
+            InspectionStatusLabel(status: status)
             if let observation, !observation.notes.isEmpty {
                 Text(observation.notes)
                     .font(.subheadline)
@@ -160,30 +159,5 @@ struct RentalPropertyDetailView: View {
         }
         .padding(.vertical, 5)
         .accessibilityElement(children: .combine)
-    }
-    
-    private func statusLabel(_ status: ObservationStatus) -> String {
-        switch status {
-        case .notChecked: return "Not Checked"
-        case .meetsNeeds: return "Meets Needs"
-        case .doesNotMeetNeeds: return "Doesn't Meet Needs"
-        case .needsClarification: return "Needs Clarification"
-        }
-    }
-    private func statusIcon(_ status: ObservationStatus) -> String {
-        switch status {
-        case .notChecked: return "circle.dashed"
-        case .meetsNeeds: return "checkmark.circle"
-        case .doesNotMeetNeeds: return "xmark.circle"
-        case .needsClarification: return "questionmark.circle"
-        }
-    }
-    private func statusColor(_ status: ObservationStatus) -> Color {
-        switch status {
-        case .notChecked: return .secondary
-        case .meetsNeeds: return .teal
-        case .doesNotMeetNeeds: return .red
-        case .needsClarification: return .orange
-        }
     }
 }
