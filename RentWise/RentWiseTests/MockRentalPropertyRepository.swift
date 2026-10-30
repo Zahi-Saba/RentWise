@@ -29,6 +29,14 @@ class MockRentalPropertyRepository: RentalPropertyRepository {
         savedInspections.append(inspection)
     }
     
+    func delete(_ inspection: RentalInspection) throws {
+        guard savedInspections.contains(where: { $0.id == inspection.id }) else {
+            throw CoreDataRentalPropertyRepositoryError.inspectionNotFound
+        }
+        savedInspections.removeAll { $0.id == inspection.id }
+        savedObservations.removeAll { $0.inspectionID == inspection.id }
+    }
+
     func delete(_ property: RentalProperty) throws {
         if let index = savedProperties.firstIndex(
             where: { $0.id == property.id }

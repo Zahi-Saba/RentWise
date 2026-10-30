@@ -33,6 +33,9 @@ struct RentalPropertyListView: View {
                             }
                             .accessibilityLabel("Upcoming inspection at \(property.address), " + "\(inspection.startTime.formatted(date: .abbreviated, time: .shortened))")
                             .accessibilityHint("Opens the property details and inspection options.")
+                            .swipeActions {
+                                Button("Delete", role: .destructive) { viewModel.deleteInspection(inspection) }
+                            }
                         }
                     }
                 }

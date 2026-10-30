@@ -66,6 +66,9 @@ struct RentalPropertyDetailView: View {
                                 .font(.caption).foregroundStyle(.secondary)
                         }.padding(.vertical, 4)
                     }
+                    .swipeActions {
+                        Button("Delete", role: .destructive) { viewModel.deleteInspection(inspection) }
+                    }
                     // Announce the inspection's date and current status
                     .accessibilityLabel(
                         "Inspection on " +
@@ -92,6 +95,20 @@ struct RentalPropertyDetailView: View {
                     Text("Open a scheduled inspection above to record your observations.")
                 }
             }
+            Section("Room-by-room inspection") {
+                ForEach(currentProperty.rooms) { room in
+                    NavigationLink {
+                        RoomInspectionView(viewModel: viewModel, propertyID: property.id, roomID: room.id)
+                    } label: {
+                        VStack(alignment: .leading, spacing: 5) {
+                            Label(room.name, systemImage: room.checked ? "checkmark.circle" : "circle")
+                            Text("\(room.defects.count) defects • \(room.checked ? "Checked" : "Not Checked")")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                    .accessibilityHint("Opens the room inspection checklist")
+                }
+            }
             if !viewModel.errorMessage.isEmpty {
                 Section { Text(viewModel.errorMessage).foregroundStyle(.red) }
             }
@@ -100,7 +117,10 @@ struct RentalPropertyDetailView: View {
         .tint(Color.accentColor)
         .navigationTitle("Property")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { viewModel.loadPropertyDetails(for: property.id) }
+        .onAppear {
+            viewModel.loadPropertyDetails(for: property.id)
+            viewModel.prepareRooms(for: property.id)
+        }
     }
 
 

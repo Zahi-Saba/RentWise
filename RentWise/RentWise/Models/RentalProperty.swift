@@ -12,6 +12,7 @@ struct RentalProperty: Identifiable {
     var address: String
     var weeklyRent: Double
     var sourceURL: String?
+    var rooms: [InspectionRoom] = []
 
     init(
         id: UUID = UUID(),

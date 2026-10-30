@@ -67,6 +67,45 @@ class RentWiseViewModel: ObservableObject {
             )
     }
 
+    func prepareRooms(for propertyID: UUID) {
+        do {
+            let property = try PrepareRoomsUseCase(repository: repository).execute(propertyID: propertyID)
+            publishRoomChanges(property)
+        } catch { errorMessage = error.localizedDescription }
+    }
+
+    func setRoomInspected(propertyID: UUID, roomID: UUID, checked: Bool) {
+        do {
+            let property = try SetRoomInspectedUseCase(repository: repository)
+                .execute(propertyID: propertyID, roomID: roomID, checked: checked)
+            publishRoomChanges(property)
+        } catch { errorMessage = error.localizedDescription }
+    }
+
+    func recordRoomDefect(propertyID: UUID, roomID: UUID, description: String, severity: DefectSeverity, photo: Data? = nil) -> Bool {
+        do {
+            let property = try RecordRoomDefectUseCase(repository: repository)
+                .execute(propertyID: propertyID, roomID: roomID, description: description, severity: severity, photo: photo)
+            publishRoomChanges(property)
+            return true
+        } catch { errorMessage = error.localizedDescription; return false }
+    }
+
+    func deleteRoomDefect(propertyID: UUID, roomID: UUID, defectID: UUID) {
+        do {
+            let property = try DeleteRoomDefectUseCase(repository: repository)
+                .execute(propertyID: propertyID, roomID: roomID, defectID: defectID)
+            publishRoomChanges(property)
+        } catch { errorMessage = error.localizedDescription }
+    }
+
+    private func publishRoomChanges(_ property: RentalProperty) {
+        if let index = rentalProperties.firstIndex(where: { $0.id == property.id }) {
+            rentalProperties[index] = property
+        } else { rentalProperties.append(property) }
+        errorMessage = ""
+    }
+
     func clearComparison() {
         comparison = nil
         comparisonError = ""
@@ -302,6 +341,20 @@ class RentWiseViewModel: ObservableObject {
     }
 
     
+    func deleteInspection(_ inspection: RentalInspection) {
+        do {
+            try DeleteInspectionUseCase(repository: repository).execute(inspection: inspection)
+            InspectionNotificationService().cancelReminders(for: [inspection])
+            observations.removeAll { $0.inspectionID == inspection.id }
+            inspectionHistory.removeAll { $0.id == inspection.id }
+            clearComparison()
+            loadPropertyDetails(for: inspection.rentalPropertyID)
+            loadUpcomingInspections() // Also refreshes the widget snapshot and timeline.
+        } catch {
+            errorMessage = "The inspection could not be deleted. Please try again."
+        }
+    }
+
     func deleteRentalProperty(_ property: RentalProperty) {
 
         do {
