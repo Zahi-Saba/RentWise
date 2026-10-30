@@ -99,7 +99,7 @@ struct RentalPropertyDetailView: View {
                     } label: {
                         VStack(alignment: .leading, spacing: 5) {
                             Label(room.name, systemImage: room.checked ? "checkmark.circle" : "circle")
-                            Text(room.checked ? "Checked" : "Not Checked")
+                            Text("\(room.defects.count) defects • \(room.checked ? "Checked" : "Not Checked")")
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                     }

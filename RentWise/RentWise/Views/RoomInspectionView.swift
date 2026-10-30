@@ -4,6 +4,7 @@ struct RoomInspectionView: View {
     @ObservedObject var viewModel: RentWiseViewModel
     let propertyID: UUID
     let roomID: UUID
+    @State private var showDefect = false
 
     private var room: InspectionRoom? {
         viewModel.rentalProperties.first { $0.id == propertyID }?.rooms.first { $0.id == roomID }
@@ -20,6 +21,26 @@ struct RoomInspectionView: View {
                 } footer: {
                     Text("Check the room before marking it inspected.")
                 }
+                Section("Defects") {
+                    if room.defects.isEmpty {
+                        Text("No defects recorded. Check the room before marking it inspected.")
+                            .foregroundStyle(.secondary)
+                    }
+                    ForEach(room.defects) { defect in
+                        VStack(alignment: .leading, spacing: 10) {
+                            Label(defect.severity.rawValue, systemImage: "exclamationmark.triangle")
+                                .font(.headline)
+                            Text(defect.description).fixedSize(horizontal: false, vertical: true)
+                        }
+                        .accessibilityElement(children: .combine)
+                        .swipeActions {
+                            Button("Delete", role: .destructive) {
+                                viewModel.deleteRoomDefect(propertyID: propertyID, roomID: roomID, defectID: defect.id)
+                            }
+                        }
+                    }
+                    Button("Record defect", systemImage: "plus.circle") { showDefect = true }
+                }
             } else {
                 Text("This room is no longer available.").foregroundStyle(.secondary)
             }
@@ -30,5 +51,8 @@ struct RoomInspectionView: View {
         .listStyle(.insetGrouped)
         .navigationTitle(room?.name ?? "Room")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showDefect) {
+            AddDefectView(viewModel: viewModel, propertyID: propertyID, roomID: roomID)
+        }
     }
 }

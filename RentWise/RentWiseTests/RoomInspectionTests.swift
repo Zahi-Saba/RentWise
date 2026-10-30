@@ -19,6 +19,36 @@ struct RoomInspectionTests {
         #expect(reloaded.weeklyRent == 610)
     }
 
+    @Test func defectsValidateDescriptionsAndStayInTheirRoom() throws {
+        let repository = MockRentalPropertyRepository()
+        let property = RentalProperty(address: "Test", weeklyRent: 610)
+        try repository.save(property)
+        let prepared = try PrepareRoomsUseCase(repository: repository).execute(propertyID: property.id)
+        let room = try #require(prepared.rooms.first)
+        let useCase = RecordRoomDefectUseCase(repository: repository)
+        #expect(throws: RoomInspectionError.self) {
+            try useCase.execute(propertyID: property.id, roomID: room.id, description: " \n ", severity: .major)
+        }
+        for severity in DefectSeverity.allCases {
+            _ = try useCase.execute(propertyID: property.id, roomID: room.id, description: "  Cracked tile  ", severity: severity)
+        }
+        let saved = try #require(repository.savedProperties.first)
+        #expect(saved.rooms[0].defects.map(\.severity) == DefectSeverity.allCases)
+        #expect(saved.rooms[0].defects.allSatisfy { $0.description == "Cracked tile" })
+        #expect(saved.rooms[1].defects.isEmpty)
+        let defect = try #require(saved.rooms[0].defects.first)
+        let updated = try DeleteRoomDefectUseCase(repository: repository).execute(propertyID: property.id, roomID: room.id, defectID: defect.id)
+        #expect(updated.rooms[0].defects.count == 2)
+        #expect(updated.rooms[0].checked == false)
+    }
+
+    @Test func olderRoomPayloadStillDecodes() throws {
+        let json = "{\"id\":\"\(UUID().uuidString)\",\"name\":\"Kitchen\",\"checked\":true}"
+        let room = try JSONDecoder().decode(InspectionRoom.self, from: Data(json.utf8))
+        #expect(room.checked)
+        #expect(room.defects.isEmpty)
+    }
+
     @Test func missingRoomDoesNotChangeProperty() throws {
         let repository = MockRentalPropertyRepository()
         let property = RentalProperty(address: "Test", weeklyRent: 610)
@@ -88,9 +118,12 @@ struct RoomInspectionTests {
         let prepared = try PrepareRoomsUseCase(repository: repository).execute(propertyID: property.id)
         let room = try #require(prepared.rooms.first)
         _ = try SetRoomInspectedUseCase(repository: repository).execute(propertyID: property.id, roomID: room.id, checked: true)
+        _ = try RecordRoomDefectUseCase(repository: repository).execute(propertyID: property.id, roomID: room.id, description: "Cracked tile", severity: .moderate)
         container.viewContext.reset()
         let restored = try #require(repository.fetchRentalProperties().first)
         #expect(restored.rooms.first?.id == room.id)
         #expect(restored.rooms.first?.checked == true)
+        #expect(restored.rooms.first?.defects.first?.description == "Cracked tile")
+        #expect(restored.rooms.first?.defects.first?.severity == .moderate)
     }
 }

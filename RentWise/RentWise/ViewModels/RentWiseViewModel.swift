@@ -82,6 +82,23 @@ class RentWiseViewModel: ObservableObject {
         } catch { errorMessage = error.localizedDescription }
     }
 
+    func recordRoomDefect(propertyID: UUID, roomID: UUID, description: String, severity: DefectSeverity) -> Bool {
+        do {
+            let property = try RecordRoomDefectUseCase(repository: repository)
+                .execute(propertyID: propertyID, roomID: roomID, description: description, severity: severity)
+            publishRoomChanges(property)
+            return true
+        } catch { errorMessage = error.localizedDescription; return false }
+    }
+
+    func deleteRoomDefect(propertyID: UUID, roomID: UUID, defectID: UUID) {
+        do {
+            let property = try DeleteRoomDefectUseCase(repository: repository)
+                .execute(propertyID: propertyID, roomID: roomID, defectID: defectID)
+            publishRoomChanges(property)
+        } catch { errorMessage = error.localizedDescription }
+    }
+
     private func publishRoomChanges(_ property: RentalProperty) {
         if let index = rentalProperties.firstIndex(where: { $0.id == property.id }) {
             rentalProperties[index] = property
