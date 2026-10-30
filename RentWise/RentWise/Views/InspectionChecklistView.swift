@@ -43,9 +43,15 @@ struct InspectionChecklistView: View {
                     if viewModel.errorMessage.isEmpty { notes = ""; saved = true }
                 } label: { Label("Save Observation", systemImage: "checkmark.circle").font(.headline).padding(.vertical, 6) }
             } footer: { Text("Add notes for each result. To change a recorded item, tap its saved observation below.") }
+            
             if !viewModel.errorMessage.isEmpty {
-                Section { Text(viewModel.errorMessage).foregroundStyle(.red) }
+                Section {
+                    Label("Error: \(viewModel.errorMessage)", systemImage: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.red)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
+            
             Section("Saved observations • \(observations.count) of 5") {
                 if observations.isEmpty {
                     Label("No observations recorded yet", systemImage: "list.bullet.clipboard")
@@ -55,6 +61,9 @@ struct InspectionChecklistView: View {
                     NavigationLink {
                         EditObservationView(viewModel: viewModel, observation: observation)
                     } label: { InspectionObservationSummary(observation: observation) }
+                        // Summarise the full inspection finding
+                        .accessibilityLabel(observationAccessibilityDescription(for: observation))
+                        .accessibilityHint("Opens this observation for editing.")
                 }
             }
         }
@@ -107,5 +116,17 @@ struct InspectionChecklistView: View {
                 }
             }
         }
+    }
+    
+    private func observationAccessibilityDescription(for observation: InspectionObservation) -> String {
+        let notes = observation.notes.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let summary = "\(observation.criterion.displayName). " + "\(observation.status.displayName)."
+
+        if notes.isEmpty {
+            return summary + " No notes recorded."
+        }
+
+        return summary + " Notes: \(notes)"
     }
 }

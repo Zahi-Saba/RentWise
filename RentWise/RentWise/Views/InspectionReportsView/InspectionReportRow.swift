@@ -51,15 +51,9 @@ struct InspectionReportRow: View {
 
         // VoiceOver treats the row as one accessible element
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(
-            "\(option.property.address), " +
-            "\(option.inspection.startTime.formatted()), " +
-            "\(option.observationCount) recorded observations"
-        )
-        .accessibilityValue(
-            isSelected ? "Selected" : "Not selected"
-        )
-        .accessibilityHint("Double tap to select this inspection")
+        .accessibilityLabel(accessibilitySummary)
+        .accessibilityValue(isSelected ? "Selected" : "Not selected")
+        .accessibilityHint(option.canGenerateReport ? "Selects this inspection for PDF generation." : "Selects this inspection. Record an observation before generating a report.")
     }
     
     private var propertyDetails: some View {
@@ -93,5 +87,20 @@ struct InspectionReportRow: View {
             }
         }
     }
+    
+    private var accessibilitySummary: String {
+        let date = option.inspection.startTime.formatted(date: .abbreviated, time: .shortened)
+
+        let availability: String
+
+        if option.canGenerateReport {
+            availability = "\(option.observationCount) recorded observations."
+        } else {
+            availability = "No recorded observations. Report unavailable."
+        }
+
+        return "\(option.property.address). " + "Inspection on \(date). " + availability
+    }
+
 }
 

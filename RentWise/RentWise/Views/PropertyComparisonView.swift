@@ -27,18 +27,29 @@ struct PropertyComparisonView: View {
                         }
                         .buttonStyle(.borderedProminent)
                         .disabled(firstID == nil || secondID == nil || firstID == secondID)
+                        .accessibilityHint("Compares weekly rent and inspection findings " + "for the two selected properties.")
                     }
                 }
                 .padding().background(.background, in: RoundedRectangle(cornerRadius: 20))
 
                 if !viewModel.errorMessage.isEmpty {
-                    Text(viewModel.errorMessage).foregroundStyle(.red)
+                    Text(viewModel.errorMessage)
+                        .foregroundStyle(.red)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
+                
                 if !viewModel.comparisonError.isEmpty {
-                    Text(viewModel.comparisonError).foregroundStyle(.red)
+                    Label("Comparison error: \(viewModel.comparisonError)", systemImage: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.red)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
+                
                 if let result = viewModel.comparison {
-                    Text(rentSummary(result)).font(.headline)
+                    Text(rentSummary(result))
+                        .font(.headline)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityAddTraits(.isHeader)
+                    
                     Text("Observations come from each property's latest inspection with saved notes. Dates may differ; unrecorded items are shown as Not Checked.")
                         .font(.footnote).foregroundStyle(.secondary)
                     
