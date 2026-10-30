@@ -27,7 +27,7 @@ struct RentalPropertyDetailView: View {
                         }
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("\(currentProperty.rentLabel). Open original listing")
+                    .accessibilityLabel("\(currentProperty.address). " + "\(currentProperty.rentLabel). Open original listing.")
                     .accessibilityHint("Opens the property website in your browser")
                 } else {
                     rentHeading
@@ -66,6 +66,15 @@ struct RentalPropertyDetailView: View {
                                 .font(.caption).foregroundStyle(.secondary)
                         }.padding(.vertical, 4)
                     }
+                    // Announce the inspection's date and current status
+                    .accessibilityLabel(
+                        "Inspection on " +
+                        "\(inspection.startTime.formatted(date: .abbreviated, time: .shortened)). " +
+                        (inspection.endTime < Date() ? "Past inspection.": "Scheduled inspection.")
+                    )
+                    .accessibilityHint(
+                        "Opens the inspection checklist to review or record observations."
+                    )
                 }
             }
 
@@ -148,8 +157,11 @@ struct RentalPropertyDetailView: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
-        }.padding(.vertical, 5)
+        }
+        .padding(.vertical, 5)
+        .accessibilityElement(children: .combine)
     }
+    
     private func statusLabel(_ status: ObservationStatus) -> String {
         switch status {
         case .notChecked: return "Not Checked"

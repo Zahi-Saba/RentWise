@@ -13,6 +13,7 @@ struct RentalPropertyListView: View {
                 Button { showImport = true } label: {
                     Label("Import listing URL", systemImage: "square.and.arrow.down")
                 }
+                .accessibilityHint("Opens a form to add a rental listing from its web address.")
             }
             if viewModel.isImportingListings {
                 Section { ProgressView("Importing shared listings…") }
@@ -30,6 +31,8 @@ struct RentalPropertyListView: View {
                                     Text(inspection.startTime.formatted()).font(.caption).foregroundStyle(.secondary)
                                 }
                             }
+                            .accessibilityLabel("Upcoming inspection at \(property.address), " + "\(inspection.startTime.formatted(date: .abbreviated, time: .shortened))")
+                            .accessibilityHint("Opens the property details and inspection options.")
                         }
                     }
                 }
@@ -49,6 +52,8 @@ struct RentalPropertyListView: View {
                             Text(property.rentLabel).font(.subheadline)
                         }.padding(.vertical, 8)
                     }
+                    .accessibilityLabel("\(property.address). \(property.rentLabel). Saved property.")
+                    .accessibilityHint("Opens property details and inspection history.")
                     .swipeActions { Button("Delete", role: .destructive) { viewModel.deleteRentalProperty(property) } }
                 }
             }
