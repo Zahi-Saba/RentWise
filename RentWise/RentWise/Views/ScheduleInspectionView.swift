@@ -97,7 +97,8 @@ struct ScheduleInspectionView: View {
 
         isScheduling = true
 
-        Task { @MainActor in {
+        Task { @MainActor in
+            defer { isScheduling = false }
             var message = "Your inspection has been saved."
 
             let reminderDate = inspection.startTime.addingTimeInterval(-30 * 60)
@@ -131,9 +132,8 @@ struct ScheduleInspectionView: View {
             }
 
             reminderMessage = message
-            isScheduling = false
             showConfirmation = true
-        }}
+        }
     }
 
     @ViewBuilder
