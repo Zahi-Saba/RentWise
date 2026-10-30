@@ -341,6 +341,20 @@ class RentWiseViewModel: ObservableObject {
     }
 
     
+    func deleteInspection(_ inspection: RentalInspection) {
+        do {
+            try DeleteInspectionUseCase(repository: repository).execute(inspection: inspection)
+            InspectionNotificationService().cancelReminders(for: [inspection])
+            observations.removeAll { $0.inspectionID == inspection.id }
+            inspectionHistory.removeAll { $0.id == inspection.id }
+            clearComparison()
+            loadPropertyDetails(for: inspection.rentalPropertyID)
+            loadUpcomingInspections() // Also refreshes the widget snapshot and timeline.
+        } catch {
+            errorMessage = "The inspection could not be deleted. Please try again."
+        }
+    }
+
     func deleteRentalProperty(_ property: RentalProperty) {
 
         do {

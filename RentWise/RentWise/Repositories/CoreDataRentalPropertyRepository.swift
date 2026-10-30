@@ -48,6 +48,18 @@ class CoreDataRentalPropertyRepository: RentalPropertyRepository {
         try context.save()
     }
 
+    func delete(_ inspection: RentalInspection) throws {
+        let request = RentalInspectionEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", inspection.id as CVarArg)
+        guard let entity = try context.fetch(request).first else {
+            throw CoreDataRentalPropertyRepositoryError.inspectionNotFound
+        }
+        // Core Data cascades to observations; the property and its rooms remain.
+        context.delete(entity)
+        do { try context.save() }
+        catch { context.rollback(); throw error }
+    }
+
     func delete(_ property: RentalProperty) throws {
 
         let request =

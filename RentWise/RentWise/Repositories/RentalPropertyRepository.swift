@@ -18,6 +18,8 @@ protocol RentalPropertyRepository {
     func save(_ observation: InspectionObservation) throws
     
     func delete(_ property: RentalProperty) throws
+
+    func delete(_ inspection: RentalInspection) throws
     
     func update(_ observation: InspectionObservation) throws
 

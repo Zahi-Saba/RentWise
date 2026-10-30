@@ -66,6 +66,9 @@ struct RentalPropertyDetailView: View {
                                 .font(.caption).foregroundStyle(.secondary)
                         }.padding(.vertical, 4)
                     }
+                    .swipeActions {
+                        Button("Delete", role: .destructive) { viewModel.deleteInspection(inspection) }
+                    }
                     // Announce the inspection's date and current status
                     .accessibilityLabel(
                         "Inspection on " +
