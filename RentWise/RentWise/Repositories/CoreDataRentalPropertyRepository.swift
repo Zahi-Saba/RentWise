@@ -30,6 +30,7 @@ class CoreDataRentalPropertyRepository: RentalPropertyRepository {
         propertyEntity.address = property.address
         propertyEntity.weeklyRent = property.weeklyRent
         propertyEntity.sourceURL = property.sourceURL
+        propertyEntity.roomsData = try JSONEncoder().encode(property.rooms)
 
         try context.save()
     }
@@ -43,6 +44,7 @@ class CoreDataRentalPropertyRepository: RentalPropertyRepository {
         entity.address = property.address
         entity.weeklyRent = property.weeklyRent
         entity.sourceURL = property.sourceURL
+        entity.roomsData = try JSONEncoder().encode(property.rooms)
         try context.save()
     }
 
@@ -166,13 +168,16 @@ class CoreDataRentalPropertyRepository: RentalPropertyRepository {
             if let id = entity.id,
                let address = entity.address {
 
-                let property = RentalProperty(
+                var property = RentalProperty(
                     id: id,
                     address: address,
                     weeklyRent: entity.weeklyRent,
                     sourceURL: entity.sourceURL
                 )
 
+                if let data = entity.roomsData {
+                    property.rooms = try JSONDecoder().decode([InspectionRoom].self, from: data)
+                }
                 properties.append(property)
             }
         }

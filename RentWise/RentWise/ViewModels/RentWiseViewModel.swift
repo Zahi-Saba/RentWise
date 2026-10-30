@@ -67,6 +67,28 @@ class RentWiseViewModel: ObservableObject {
             )
     }
 
+    func prepareRooms(for propertyID: UUID) {
+        do {
+            let property = try PrepareRoomsUseCase(repository: repository).execute(propertyID: propertyID)
+            publishRoomChanges(property)
+        } catch { errorMessage = error.localizedDescription }
+    }
+
+    func setRoomInspected(propertyID: UUID, roomID: UUID, checked: Bool) {
+        do {
+            let property = try SetRoomInspectedUseCase(repository: repository)
+                .execute(propertyID: propertyID, roomID: roomID, checked: checked)
+            publishRoomChanges(property)
+        } catch { errorMessage = error.localizedDescription }
+    }
+
+    private func publishRoomChanges(_ property: RentalProperty) {
+        if let index = rentalProperties.firstIndex(where: { $0.id == property.id }) {
+            rentalProperties[index] = property
+        } else { rentalProperties.append(property) }
+        errorMessage = ""
+    }
+
     func clearComparison() {
         comparison = nil
         comparisonError = ""

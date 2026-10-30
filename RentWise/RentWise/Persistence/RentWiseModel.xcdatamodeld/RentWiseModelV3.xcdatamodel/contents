@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="25249" systemVersion="25G83" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="InspectionObservationEntity" representedClassName=".InspectionObservationEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="criterion" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="status" optional="YES" attributeType="String"/>
+        <relationship name="inspection" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="RentalInspectionEntity" inverseName="observations" inverseEntity="RentalInspectionEntity"/>
+    </entity>
+    <entity name="RentalInspectionEntity" representedClassName=".RentalInspectionEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="endTime" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="startTime" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="observations" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="InspectionObservationEntity" inverseName="inspection" inverseEntity="InspectionObservationEntity"/>
+        <relationship name="rentalProperty" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="RentalPropertyEntity" inverseName="inspections" inverseEntity="RentalPropertyEntity"/>
+    </entity>
+    <entity name="RentalPropertyEntity" representedClassName=".RentalPropertyEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="roomsData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="address" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="sourceURL" optional="YES" attributeType="String"/>
+        <attribute name="weeklyRent" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="inspections" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="RentalInspectionEntity" inverseName="rentalProperty" inverseEntity="RentalInspectionEntity"/>
+    </entity>
+</model>
