@@ -23,7 +23,14 @@ struct PropertyComparisonView: View {
                         selector("Property B", selection: $secondID, excluding: firstID)
                         Button(action: compare) {
                             Label("Compare Properties", systemImage: "rectangle.split.2x1")
-                                .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 6)
+                                .font(.headline)
+                                // Allow enlarged text to occupy multiple lines
+                                .fixedSize(horizontal: false, vertical: true)
+                                // Fill the available horizontal space
+                                .frame(maxWidth: .infinity)
+                                // Maintain a minimum 44-point interactive label height
+                                .frame(minHeight: 44)
+                                .padding(.vertical, 6)
                         }
                         .buttonStyle(.borderedProminent)
                         .disabled(firstID == nil || secondID == nil || firstID == secondID)
@@ -164,11 +171,26 @@ struct PropertyComparisonView: View {
             } else {
                 Text("No recorded observations").font(.caption).foregroundStyle(.secondary)
             }
-            NavigationLink("Open property") {
+            
+            NavigationLink {
                 RentalPropertyDetailView(viewModel: viewModel, property: item.property)
+            } label: {
+                Label("Open property", systemImage: "arrow.up.right")
+                    .font(.subheadline.weight(.semibold))
+                    // Allow the label to wrap at larger Dynamic Type sizes
+                    .fixedSize(horizontal: false, vertical: true)
+
+                    // Ensure the interactive label has at least 44 pt height
+                    .frame(maxWidth: .infinity, minHeight: 44)
+
+                    // Make the full rectangular label area interactive
+                    .contentShape(Rectangle())
             }
+            .buttonStyle(.bordered)
             .accessibilityLabel("Open \(item.property.address)")
-        }.frame(width: width, alignment: .leading)
+            .accessibilityHint("Opens the property's details and inspections.")
+        }
+        .frame(width: width, alignment: .leading)
     }
 
     private func observationCell(_ item: ComparedProperty, criterion: InspectionCriterion, width: CGFloat?) -> some View {
