@@ -105,3 +105,18 @@ struct SharedWidgetData {
         }
     }
 }
+
+// Pure date filtering shared with the widget and covered by app tests.
+extension SharedWidgetData {
+    static func upcoming(_ inspections: [SharedInspection], at date: Date) -> [SharedInspection] {
+        inspections.filter { $0.endTime > date && $0.endTime > $0.startTime }
+            .sorted { $0.startTime < $1.startTime }
+    }
+
+    static func timelineDates(for inspections: [SharedInspection], from date: Date) -> [Date] {
+        let horizon = date.addingTimeInterval(24 * 60 * 60)
+        let boundaries = upcoming(inspections, at: date).flatMap { [$0.startTime, $0.endTime] }
+            .filter { $0 > date && $0 < horizon }
+        return [date] + Array(Set(boundaries)).sorted()
+    }
+}
