@@ -53,7 +53,7 @@ struct InspectionReportRow: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilitySummary)
         .accessibilityValue(isSelected ? "Selected" : "Not selected")
-        .accessibilityHint(option.canGenerateReport ? "Selects this inspection for PDF generation." : "Selects this inspection. Record an observation before generating a report.")
+        .accessibilityHint(option.canGenerateReport ? "Selects this inspection for PDF generation." : "Selects this inspection. Record an observation or room finding before generating a report.")
     }
     
     private var propertyDetails: some View {
@@ -73,14 +73,14 @@ struct InspectionReportRow: View {
             // Observation availability
             if option.canGenerateReport {
                 Label(
-                    "\(option.observationCount) recorded observations",
+                    option.findingsLabel,
                     systemImage: "checkmark.circle"
                 )
                 .font(.caption)
                 .foregroundStyle(.green)
                 .fixedSize(horizontal: false, vertical: true)
             } else {
-                Label("No recorded observations", systemImage: "exclamationmark.circle")
+                Label("No recorded findings", systemImage: "exclamationmark.circle")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -94,9 +94,9 @@ struct InspectionReportRow: View {
         let availability: String
 
         if option.canGenerateReport {
-            availability = "\(option.observationCount) recorded observations."
+            availability = option.findingsLabel
         } else {
-            availability = "No recorded observations. Report unavailable."
+            availability = "No recorded findings. Report unavailable."
         }
 
         return "\(option.property.address). " + "Inspection on \(date). " + availability

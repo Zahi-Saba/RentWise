@@ -12,6 +12,32 @@ struct ComparePropertiesTests {
         return (repository, a, b)
     }
 
+    @Test func comparesRoomFindingsWithoutRequiringDatedObservations() throws {
+        let (repository, a, b) = fixture()
+        repository.savedProperties[0].rooms = [InspectionRoom(name: "Kitchen", checked: true,
+            defects: [RoomDefect(description: "Cracked tile", severity: .major, photo: Data([1, 2, 3]))])]
+        repository.savedProperties[1].rooms = [InspectionRoom(name: "Bathroom", checked: false,
+            defects: [RoomDefect(description: "Leak", severity: .moderate)])]
+        let result = try ComparePropertiesUseCase(repository: repository).execute(firstID: a.id, secondID: b.id)
+        #expect(result.first.inspection == nil)
+        #expect(result.first.property.roomFindings.checkedCount == 1)
+        #expect(result.first.property.roomFindings.count(for: .major) == 1)
+        #expect(result.first.property.rooms.first?.defects.first?.photo == Data([1, 2, 3]))
+        #expect(result.second.property.roomFindings.checkedCount == 0)
+        #expect(result.second.property.roomFindings.count(for: .moderate) == 1)
+        #expect(result.roomNames == InspectionRoom.standardNames)
+    }
+
+    @Test func missingRoomsRemainUnknownAndAdditionalRoomsAreIncluded() throws {
+        let (repository, a, b) = fixture()
+        repository.savedProperties[1].rooms = [InspectionRoom(name: "Balcony")]
+        let result = try ComparePropertiesUseCase(repository: repository).execute(firstID: a.id, secondID: b.id)
+        #expect(result.first.property.rooms.isEmpty)
+        #expect(!result.first.property.roomFindings.hasFindings)
+        #expect(result.roomNames.last == "Balcony")
+        #expect(repository.savedProperties[0].rooms.isEmpty)
+    }
+
     @Test func requiresTwoDistinctSavedProperties() throws {
         let (repository, a, _) = fixture()
         let useCase = ComparePropertiesUseCase(repository: repository)

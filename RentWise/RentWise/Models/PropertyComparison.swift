@@ -14,6 +14,14 @@ struct PropertyComparison {
     let first: ComparedProperty
     let second: ComparedProperty
 
+    var roomNames: [String] {
+        var names = InspectionRoom.standardNames
+        for room in first.property.rooms + second.property.rooms where !names.contains(room.name) {
+            names.append(room.name)
+        }
+        return names
+    }
+
     // Signed difference: positive means the first property costs more.
     // Unknown rent is never treated as free rent.
     var weeklyRentDifference: Double? {

@@ -13,7 +13,7 @@ struct PropertyComparisonView: View {
                 VStack(alignment: .leading, spacing: 14) {
                     Label("Find the better fit", systemImage: "rectangle.split.2x1")
                         .font(.title2.bold())
-                    Text("Choose two saved properties to compare rent and inspection observations.")
+                    Text("Choose two saved properties to compare rent, inspection observations and room defects.")
                         .foregroundStyle(.secondary)
                     if viewModel.rentalProperties.count < 2 {
                         Label("Save at least two properties to compare.", systemImage: "house")
@@ -109,6 +109,16 @@ struct PropertyComparisonView: View {
                     observationCell(result.second, criterion: criterion, width: width)
                 }
             }
+            GridRow {
+                roomSummary(result.first, width: width)
+                roomSummary(result.second, width: width)
+            }
+            ForEach(result.roomNames, id: \.self) { name in
+                GridRow {
+                    roomCell(result.first, name: name, width: width)
+                    roomCell(result.second, name: name, width: width)
+                }
+            }
         }.padding().background(.background, in: RoundedRectangle(cornerRadius: 20))
     }
 
@@ -125,17 +135,17 @@ struct PropertyComparisonView: View {
 
             accessiblePropertyCard(
                 result.first,
-                label: "Property A"
+                label: "Property A", roomNames: result.roomNames
             )
 
             accessiblePropertyCard(
                 result.second,
-                label: "Property B"
+                label: "Property B", roomNames: result.roomNames
             )
         }
     }
 
-    private func accessiblePropertyCard(_ item: ComparedProperty, label: String) -> some View {
+    private func accessiblePropertyCard(_ item: ComparedProperty, label: String, roomNames: [String]) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             // Property information and weekly rent
             header(item, label: label, width: nil)
@@ -145,6 +155,10 @@ struct PropertyComparisonView: View {
             // Display all comparison criteria vertically
             ForEach(InspectionCriterion.allCases, id: \.self) { criterion in
                 observationCell(item, criterion: criterion, width: nil)
+            }
+            roomSummary(item, width: nil)
+            ForEach(roomNames, id: \.self) { name in
+                roomCell(item, name: name, width: nil)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -212,6 +226,27 @@ struct PropertyComparisonView: View {
         .frame(width: width, alignment: .leading)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(item.property.address), \(criterion.displayName), \(status.displayName). \(observation?.notes ?? "")")
+    }
+
+    private func roomSummary(_ item: ComparedProperty, width: CGFloat?) -> some View {
+        let findings = item.property.roomFindings
+        return VStack(alignment: .leading, spacing: 8) {
+            Divider()
+            Text("Current room findings").font(.headline)
+            Text("\(findings.checkedCount) rooms inspected • \(findings.defects.count) recorded defects")
+            Text("Minor: \(findings.count(for: .minor)) • Moderate: \(findings.count(for: .moderate)) • Major: \(findings.count(for: .major))")
+                .font(.caption)
+            Text("Saved for this property, not a dated inspection. Unchecked rooms may still have defects.")
+                .font(.caption).foregroundStyle(.secondary)
+        }
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(width: width, alignment: .leading)
+        .accessibilityElement(children: .combine)
+    }
+
+    private func roomCell(_ item: ComparedProperty, name: String, width: CGFloat?) -> some View {
+        RoomFindingsView(name: name, room: item.property.rooms.first { $0.name == name })
+            .frame(width: width, alignment: .leading)
     }
 
     private func rentSummary(_ result: PropertyComparison) -> String {

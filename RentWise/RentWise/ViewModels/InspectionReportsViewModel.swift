@@ -79,7 +79,7 @@ final class InspectionReportsViewModel: ObservableObject {
         }
 
         guard option.canGenerateReport else {
-            errorMessage = "Record at least one inspection observation before generating a report."
+            errorMessage = "Record an observation, mark a room inspected or add a room defect before generating a report."
             return
         }
 

@@ -20,7 +20,9 @@ struct InspectionRoom: Codable, Identifiable, Equatable {
         defects = try values.decodeIfPresent([RoomDefect].self, forKey: .defects) ?? []
     }
 
+    static let standardNames = ["Kitchen", "Bathroom", "Bedroom", "Living Area"]
+
     static func standardRooms() -> [InspectionRoom] {
-        ["Kitchen", "Bathroom", "Bedroom", "Living Area"].map { InspectionRoom(name: $0) }
+        standardNames.map { InspectionRoom(name: $0) }
     }
 }

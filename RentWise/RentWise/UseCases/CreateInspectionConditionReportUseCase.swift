@@ -29,8 +29,8 @@ struct CreateInspectionConditionReportUseCase {
         let observations = try repository.fetchObservations(for: inspection.id)
 
         // A condition report should contain recorded findings
-        guard !observations.isEmpty else {
-            throw CreateInspectionConditionReportError.noObservations
+        guard !observations.isEmpty || property.roomFindings.hasFindings else {
+            throw CreateInspectionConditionReportError.noFindings
         }
 
         // Protect against accidentally mixing observations from different inspections

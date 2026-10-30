@@ -193,6 +193,40 @@ struct InspectionReportPDFRenderer: InspectionReportPDFRendering {
                 }
             }
 
+            ensureSpace(100)
+            write("CURRENT ROOM FINDINGS", font: headingFont, color: accent, gap: 10)
+            write("Room checklists and defects are saved for the property. This section shows their current state when this report was generated; it is not a historical snapshot of the selected inspection.", color: secondaryInk, gap: 10)
+            let summary = report.property.roomFindings
+            write("\(summary.checkedCount) rooms inspected; \(summary.defects.count) recorded defects. Minor: \(summary.count(for: .minor)); Moderate: \(summary.count(for: .moderate)); Major: \(summary.count(for: .major)).", gap: 12)
+            if report.property.rooms.isEmpty {
+                write("No room checklist recorded yet.", color: secondaryInk)
+            }
+            for room in report.property.rooms {
+                ensureSpace(65)
+                write(room.name, font: headingFont, gap: 3)
+                write("Status: \(room.checked ? "Inspected" : "Not checked")", color: secondaryInk, indent: 12)
+                if room.defects.isEmpty {
+                    write(room.checked ? "No defects recorded." : "No defects recorded; this room has not been checked.", color: secondaryInk, indent: 12, gap: 12)
+                }
+                for (index, defect) in room.defects.enumerated() {
+                    ensureSpace(60)
+                    write("Defect \(index + 1) - \(defect.severity.rawValue)", font: headingFont, indent: 12, gap: 3)
+                    write(defect.description, indent: 12, gap: 8)
+                    if let data = defect.photo {
+                        if let image = UIImage(data: data), image.size.width > 0, image.size.height > 0 {
+                            let scale = min((usableWidth - 24) / image.size.width, 220 / image.size.height)
+                            let size = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+                            ensureSpace(size.height + 45)
+                            write("\(room.name) - defect \(index + 1) photo", color: secondaryInk, indent: 12, gap: 3)
+                            image.draw(in: CGRect(x: margin + 12, y: y, width: size.width, height: size.height))
+                            y += size.height + 14
+                        } else {
+                            write("Saved photo could not be displayed.", color: secondaryInk, indent: 12)
+                        }
+                    }
+                }
+            }
+
             // Important disclaimer
             ensureSpace(50)
 
