@@ -84,7 +84,7 @@ struct CreateInspectionConditionReportUseCaseTests {
 
         let useCase = CreateInspectionConditionReportUseCase(repository: repository)
 
-        #expect(throws: CreateInspectionConditionReportError.noObservations) {
+        #expect(throws: CreateInspectionConditionReportError.noFindings) {
             try useCase.execute(propertyID: property.id, inspectionID: inspection.id)
         }
     }

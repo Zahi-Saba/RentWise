@@ -14,8 +14,12 @@ struct InspectionReportOption: Identifiable {
     let inspection: RentalInspection
     let observationCount: Int
 
+    var findingsLabel: String {
+        "\(observationCount) observations • \(property.roomFindings.checkedCount) rooms inspected • \(property.roomFindings.defects.count) defects"
+    }
+
     // Only inspections containing recorded findings  are ready for report generation
-    var canGenerateReport: Bool {observationCount > 0}
+    var canGenerateReport: Bool { observationCount > 0 || property.roomFindings.hasFindings }
 }
 
 struct ListInspectionReportOptionsUseCase {

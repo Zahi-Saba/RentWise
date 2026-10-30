@@ -10,7 +10,7 @@ import Foundation
 enum CreateInspectionConditionReportError: LocalizedError {
     case propertyNotFound
     case inspectionNotFound
-    case noObservations
+    case noFindings
     case mismatchedObservations
 
     var errorDescription: String? {
@@ -21,8 +21,8 @@ enum CreateInspectionConditionReportError: LocalizedError {
         case .inspectionNotFound:
             return "The selected inspection does not belong to this property or no longer exists."
 
-        case .noObservations:
-            return "Record at least one inspection observation before generating a condition report."
+        case .noFindings:
+            return "Record an observation, mark a room inspected or add a room defect before generating a condition report."
 
         case .mismatchedObservations:
             return "Some inspection observations do not belong to this inspection."

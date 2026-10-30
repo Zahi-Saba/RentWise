@@ -37,7 +37,7 @@ struct InspectionReportsView: View {
                     Text(
                         "Select a saved inspection to generate " +
                         "a PDF report containing property details, " +
-                        "inspection findings and notes."
+                        "inspection observations, current room findings, defects and photos."
                     )
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
@@ -68,6 +68,19 @@ struct InspectionReportsView: View {
                 }
             }
             
+            if let selectedOption = viewModel.selectedOption {
+                Section {
+                    Text("These are the property's current room findings, not a historical snapshot of the selected inspection.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                    if selectedOption.property.rooms.isEmpty {
+                        Text("No room checklist recorded yet.").foregroundStyle(.secondary)
+                    }
+                    ForEach(selectedOption.property.rooms) { room in
+                        RoomFindingsView(name: room.name, room: room)
+                    }
+                } header: { Text("Current room findings") }
+            }
+
             // Generate report
             Section {
                 // Generate PDF button
@@ -97,8 +110,7 @@ struct InspectionReportsView: View {
                 
                 if let selectedOption = viewModel.selectedOption, !selectedOption.canGenerateReport {
                     Label(
-                        "Record at least one inspection " +
-                        "observation before generating a report.",
+                        "Record an observation, mark a room inspected or add a defect before generating a report.",
                         systemImage: "info.circle"
                     )
                     .font(.footnote)
