@@ -11,4 +11,5 @@ struct RoomDefect: Codable, Identifiable, Equatable {
     var id = UUID()
     var description: String
     var severity: DefectSeverity
+    var photo: Data? = nil
 }

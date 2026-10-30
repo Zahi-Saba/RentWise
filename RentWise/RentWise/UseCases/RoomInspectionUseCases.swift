@@ -1,10 +1,11 @@
 import Foundation
 
 enum RoomInspectionError: LocalizedError {
-    case propertyNotFound, roomNotFound, missingDescription, defectNotFound
+    case propertyNotFound, roomNotFound, missingDescription, defectNotFound, photoTooLarge
     var errorDescription: String? {
         switch self {
         case .propertyNotFound: return "This saved property could not be found."
+        case .photoTooLarge: return "This photo is too large. Choose a smaller image."
         case .missingDescription: return "Add a description of the defect."
         case .defectNotFound: return "This defect could not be found."
         case .roomNotFound: return "This room could not be found."
@@ -43,16 +44,17 @@ struct SetRoomInspectedUseCase {
 
 struct RecordRoomDefectUseCase {
     let repository: RentalPropertyRepository
-    func execute(propertyID: UUID, roomID: UUID, description: String, severity: DefectSeverity) throws -> RentalProperty {
+    func execute(propertyID: UUID, roomID: UUID, description: String, severity: DefectSeverity, photo: Data? = nil) throws -> RentalProperty {
         let description = description.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !description.isEmpty else { throw RoomInspectionError.missingDescription }
+        if let photo, photo.count > 5_000_000 { throw RoomInspectionError.photoTooLarge }
         guard var property = try repository.fetchRentalProperties().first(where: { $0.id == propertyID }) else {
             throw RoomInspectionError.propertyNotFound
         }
         guard let index = property.rooms.firstIndex(where: { $0.id == roomID }) else {
             throw RoomInspectionError.roomNotFound
         }
-        property.rooms[index].defects.append(RoomDefect(description: description, severity: severity))
+        property.rooms[index].defects.append(RoomDefect(description: description, severity: severity, photo: photo))
         try repository.update(property)
         return property
     }

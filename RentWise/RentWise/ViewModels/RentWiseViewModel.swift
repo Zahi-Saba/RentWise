@@ -82,10 +82,10 @@ class RentWiseViewModel: ObservableObject {
         } catch { errorMessage = error.localizedDescription }
     }
 
-    func recordRoomDefect(propertyID: UUID, roomID: UUID, description: String, severity: DefectSeverity) -> Bool {
+    func recordRoomDefect(propertyID: UUID, roomID: UUID, description: String, severity: DefectSeverity, photo: Data? = nil) -> Bool {
         do {
             let property = try RecordRoomDefectUseCase(repository: repository)
-                .execute(propertyID: propertyID, roomID: roomID, description: description, severity: severity)
+                .execute(propertyID: propertyID, roomID: roomID, description: description, severity: severity, photo: photo)
             publishRoomChanges(property)
             return true
         } catch { errorMessage = error.localizedDescription; return false }

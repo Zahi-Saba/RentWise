@@ -31,6 +31,10 @@ struct RoomInspectionView: View {
                             Label(defect.severity.rawValue, systemImage: "exclamationmark.triangle")
                                 .font(.headline)
                             Text(defect.description).fixedSize(horizontal: false, vertical: true)
+                            if let data = defect.photo, let image = UIImage(data: data) {
+                                Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 220)
+                                    .accessibilityLabel("Defect photo: \(defect.description)")
+                            }
                         }
                         .accessibilityElement(children: .combine)
                         .swipeActions {

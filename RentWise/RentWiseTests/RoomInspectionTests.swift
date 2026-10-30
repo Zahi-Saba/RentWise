@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 import CoreData
+import UIKit
 @testable import RentWise
 
 @MainActor
@@ -40,6 +41,34 @@ struct RoomInspectionTests {
         let updated = try DeleteRoomDefectUseCase(repository: repository).execute(propertyID: property.id, roomID: room.id, defectID: defect.id)
         #expect(updated.rooms[0].defects.count == 2)
         #expect(updated.rooms[0].checked == false)
+    }
+
+    @Test func photoPreparationResizesAndRejectsInvalidData() throws {
+        let image = UIGraphicsImageRenderer(size: CGSize(width: 2000, height: 1000)).image { context in
+            UIColor.red.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 2000, height: 1000))
+        }
+        let data = try #require(image.pngData())
+        let prepared = try DefectPhotoService.prepare(data)
+        let decoded = try #require(UIImage(data: prepared))
+        #expect(max(decoded.size.width, decoded.size.height) <= 1400)
+        #expect(prepared.count <= 5_000_000)
+        #expect(throws: DefectPhotoService.PhotoError.self) {
+            try DefectPhotoService.prepare(Data("not an image".utf8))
+        }
+    }
+
+    @Test func oversizedPhotoDoesNotSaveDefect() throws {
+        let repository = MockRentalPropertyRepository()
+        let property = RentalProperty(address: "Test", weeklyRent: 610)
+        try repository.save(property)
+        let prepared = try PrepareRoomsUseCase(repository: repository).execute(propertyID: property.id)
+        let room = try #require(prepared.rooms.first)
+        #expect(throws: RoomInspectionError.self) {
+            try RecordRoomDefectUseCase(repository: repository).execute(propertyID: property.id,
+                roomID: room.id, description: "Crack", severity: .minor, photo: Data(count: 5_000_001))
+        }
+        #expect(repository.savedProperties.first?.rooms.first?.defects.isEmpty == true)
     }
 
     @Test func olderRoomPayloadStillDecodes() throws {
@@ -118,12 +147,17 @@ struct RoomInspectionTests {
         let prepared = try PrepareRoomsUseCase(repository: repository).execute(propertyID: property.id)
         let room = try #require(prepared.rooms.first)
         _ = try SetRoomInspectedUseCase(repository: repository).execute(propertyID: property.id, roomID: room.id, checked: true)
-        _ = try RecordRoomDefectUseCase(repository: repository).execute(propertyID: property.id, roomID: room.id, description: "Cracked tile", severity: .moderate)
+        let image = UIGraphicsImageRenderer(size: CGSize(width: 30, height: 30)).image { context in
+            UIColor.red.setFill(); context.fill(CGRect(x: 0, y: 0, width: 30, height: 30))
+        }
+        let photo = try #require(image.jpegData(compressionQuality: 0.75))
+        _ = try RecordRoomDefectUseCase(repository: repository).execute(propertyID: property.id, roomID: room.id, description: "Cracked tile", severity: .moderate, photo: photo)
         container.viewContext.reset()
         let restored = try #require(repository.fetchRentalProperties().first)
         #expect(restored.rooms.first?.id == room.id)
         #expect(restored.rooms.first?.checked == true)
         #expect(restored.rooms.first?.defects.first?.description == "Cracked tile")
         #expect(restored.rooms.first?.defects.first?.severity == .moderate)
+        #expect(restored.rooms.first?.defects.first?.photo == photo)
     }
 }
